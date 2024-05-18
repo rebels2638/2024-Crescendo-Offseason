@@ -14,8 +14,10 @@ public class ModuleIOTalon implements ModuleIO{
     private TalonFX m_drive = new TalonFX(21);
     private TalonFX m_angle = new TalonFX(20); 
     private CANcoder angleEncoder;
+    private final int id;
 
     public ModuleIOTalon(int id) {
+        this.id = id;
         // basic CANcoder config
         CANcoderConfiguration endocerConfig = new CANcoderConfiguration();
         endocerConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;

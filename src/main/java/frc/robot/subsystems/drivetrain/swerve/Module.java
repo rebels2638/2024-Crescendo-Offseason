@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drivetrain.swerve;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -9,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Module extends SubsystemBase {
     private static final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
     private final ModuleIO io;
+    private final int id;
 
     private SwerveModuleState desiredState;
 
@@ -18,12 +21,16 @@ public class Module extends SubsystemBase {
     private final SimpleMotorFeedforward driveMotorFeedforwardController = new SimpleMotorFeedforward(0, 0);
     private final SimpleMotorFeedforward angleMotorFeedforwardController = new SimpleMotorFeedforward(0, 0);
 
-    public Module(ModuleIO io) {
+    public Module(ModuleIO io, int id) {
         this.io = io;
+        this.id = id;
     }
 
     @Override
     public void periodic() {
+        io.updateInputs(inputs);
+        Logger.processInputs("Swerve/Module/" + id, inputs);
+        
         driveMotorFeedbackController.setSetpoint(desiredState.speedMetersPerSecond);
         double driveFBVoltage = angleMotorFeedbackController.calculate(inputs.driveVelocityMps);
         double driveFFVoltage = 

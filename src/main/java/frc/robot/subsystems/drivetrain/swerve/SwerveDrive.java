@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drivetrain.swerve;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -17,20 +19,19 @@ public class SwerveDrive extends SubsystemBase{
     private Module[] modules;
     private ChassisSpeeds desiredSpeeds = new ChassisSpeeds(0,0,0);
 
-    public SwerveDrive() {
-        switch (Constants.currentMode) {
-            case REAL:
-                for (int i = 0; i < 4; i++) {
-                    modules[i] = new Module(new ModuleIOTalon(i));
-                }
-            default:
-                break;
-        }
-        
+    private final GyroIO gyroIO;
+    private GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+
+    public SwerveDrive(Module[] modules, GyroIO gyroIO) {
+        this.modules = modules;
+        this.gyroIO = gyroIO;
     }
 
     @Override 
     public void periodic() {
+        gyroIO.updateInputs(gyroInputs);
+        Logger.processInputs("Gyro", gyroInputs);
+
         SwerveModuleState[] desiredModuleStates = m_kinematics.toSwerveModuleStates(desiredSpeeds);
         for (int i = 0; i < 4; i++) {
             modules[i].setModuleState(desiredModuleStates[i]);
@@ -42,6 +43,6 @@ public class SwerveDrive extends SubsystemBase{
     }
 
     public void driveRobotRelatve(ChassisSpeeds speeds) {
-        
+        desiredSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, gyroInputs.yaw);
     }
 }
