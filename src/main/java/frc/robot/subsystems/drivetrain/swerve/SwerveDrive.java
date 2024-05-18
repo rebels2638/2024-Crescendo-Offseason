@@ -36,4 +36,12 @@ public class SwerveDrive extends SubsystemBase{
             modules[i].setModuleState(desiredModuleStates[i]);
         }
     }
+
+    public void driveFeildRelative(ChassisSpeeds speeds) {
+        desiredSpeeds = speeds;
+    }
+
+    public void driveRobotRelatve(ChassisSpeeds speeds) {
+        
+    }
 }
