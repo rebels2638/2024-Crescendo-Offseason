@@ -1,7 +1,6 @@
 package frc.robot.subsystems.drivetrain.swerve;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
@@ -14,10 +13,8 @@ public class ModuleIOTalon implements ModuleIO{
     private TalonFX m_drive = new TalonFX(21);
     private TalonFX m_angle = new TalonFX(20); 
     private CANcoder angleEncoder;
-    private final int id;
 
     public ModuleIOTalon(int id) {
-        this.id = id;
         // basic CANcoder config
         CANcoderConfiguration endocerConfig = new CANcoderConfiguration();
         endocerConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
@@ -50,8 +47,14 @@ public class ModuleIOTalon implements ModuleIO{
     public void updateInputs(ModuleIOInputs inputs) {
         // TODO: Check for fauly readings in encoder
         inputs.anglePoseRad = angleEncoder.getPosition().getValueAsDouble() * 2 * Math.PI;
+
         inputs.driveVelocityMps = 
             m_drive.getVelocity().getValueAsDouble() *
+            Constants.DrivetrainConstants.driveMotorOutputToShaftRatio * 
+            Constants.DrivetrainConstants.driveWheelRadiusMeters * 2 * Math.PI;
+            
+        inputs.drivePositionsMeters = 
+            m_drive.getPosition().getValueAsDouble() *
             Constants.DrivetrainConstants.driveMotorOutputToShaftRatio * 
             Constants.DrivetrainConstants.driveWheelRadiusMeters * 2 * Math.PI;
     }
@@ -65,4 +68,6 @@ public class ModuleIOTalon implements ModuleIO{
     public void setAngleVoltage(double voltage) {
         m_angle.setVoltage(voltage);
     }
+
+
 }
