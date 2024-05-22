@@ -5,10 +5,10 @@ import java.lang.Override;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
-public class FlywheelOInputsAutoLogged extends FlywheeIO.FlywheelOInputs implements LoggableInputs, Cloneable {
+public class FlywheeIOInputsAutoLogged extends FlywheeIO.FlywheeIOInputs implements LoggableInputs, Cloneable {
   @Override
   public void toLog(LogTable table) {
-    table.put("Rmp", rmp);
+    table.put("RMP", RMP);
     table.put("TTemp", tTemp);
     table.put("BTemp", bTemp);
     table.put("TAmps", tAmps);
@@ -19,7 +19,7 @@ public class FlywheelOInputsAutoLogged extends FlywheeIO.FlywheelOInputs impleme
 
   @Override
   public void fromLog(LogTable table) {
-    rmp = table.get("Rmp", rmp);
+    RMP = table.get("RMP", RMP);
     tTemp = table.get("TTemp", tTemp);
     bTemp = table.get("BTemp", bTemp);
     tAmps = table.get("TAmps", tAmps);
@@ -28,9 +28,9 @@ public class FlywheelOInputsAutoLogged extends FlywheeIO.FlywheelOInputs impleme
     bVolts = table.get("BVolts", bVolts);
   }
 
-  public FlywheelOInputsAutoLogged clone() {
-    FlywheelOInputsAutoLogged copy = new FlywheelOInputsAutoLogged();
-    copy.rmp = this.rmp;
+  public FlywheeIOInputsAutoLogged clone() {
+    FlywheeIOInputsAutoLogged copy = new FlywheeIOInputsAutoLogged();
+    copy.RMP = this.RMP;
     copy.tTemp = this.tTemp;
     copy.bTemp = this.bTemp;
     copy.tAmps = this.tAmps;

@@ -15,7 +15,6 @@ public interface FlywheeIO {
 
         public double tVolts;
         public double bVolts;
-
     }
 
     public default void updateInputs(FlywheeIOInputs inputs) {}

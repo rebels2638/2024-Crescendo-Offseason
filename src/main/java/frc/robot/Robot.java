@@ -4,6 +4,13 @@
 
 package frc.robot;
 
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+
+import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -14,20 +21,51 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
-
   private RobotContainer m_robotContainer;
 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
+
+  String logPath = "/Users/conne/Downloads/"; // TODO: Remember to change this value guys (Edan)
+
   @Override
   public void robotInit() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
+    
+    SignalLogger.enableAutoLogging(true); // TODO: ABSOLUTELY NEED TO BE HERE FOR COMPS
+    Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
+
+    switch (Constants.currentMode) {
+    // Running on a real robot, log to a USB stick
+    case REAL:
+      // Logger.addDataReceiver(new WPILOGWriter("D:/"));
+      Logger.addDataReceiver(new NT4Publisher());
+      break;
+
+    // Running a physics simulator, log to local folder
+    case SIM:
+      // Logger.addDataReceiver(new WPILOGWriter(logPath));
+      Logger.addDataReceiver(new NT4Publisher());
+      break;
+
+    // Replaying a log, set up replay source
+    default:
+      setUseTiming(false);
+      String logPath = LogFileUtil.findReplayLog();
+      // Logger.setReplaySource(new WPILOGReader(logPath));
+      // // Logger.addDataReceiver(new NT4Publisher());
+      // Logger.addDataReceiver(new WPILOGWriter(logPath));
+      break;
+    }
+
+    Logger.start();
+
     m_robotContainer = new RobotContainer();
+
+      
   }
 
   /**
@@ -56,12 +94,12 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-    // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
-    }
+    // // schedule the autonomous command (example)
+    // if (m_autonomousCommand != null) {
+    //   m_autonomousCommand.schedule();
+    // }
   }
 
   /** This function is called periodically during autonomous. */

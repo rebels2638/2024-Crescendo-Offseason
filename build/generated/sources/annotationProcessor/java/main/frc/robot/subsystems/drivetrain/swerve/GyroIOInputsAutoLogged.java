@@ -9,16 +9,19 @@ public class GyroIOInputsAutoLogged extends GyroIO.GyroIOInputs implements Logga
   @Override
   public void toLog(LogTable table) {
     table.put("Yaw", yaw);
+    table.put("IsConnected", isConnected);
   }
 
   @Override
   public void fromLog(LogTable table) {
     yaw = table.get("Yaw", yaw);
+    isConnected = table.get("IsConnected", isConnected);
   }
 
   public GyroIOInputsAutoLogged clone() {
     GyroIOInputsAutoLogged copy = new GyroIOInputsAutoLogged();
     copy.yaw = this.yaw;
+    copy.isConnected = this.isConnected;
     return copy;
   }
 }

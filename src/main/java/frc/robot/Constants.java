@@ -15,7 +15,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final Mode currentMode = Mode.REAL; // TODO: change this if sim
+  public static final Mode currentMode = Mode.SIM; // TODO: change this if sim
 
   public static enum Mode {
     /** Running on a real robot. */
@@ -25,7 +25,9 @@ public final class Constants {
     SIM,
 
     /** Replaying from a log file. */
-    REPLAY
+    REPLAY_REAL,
+
+    REPLAY_SIM
   }
   
   public static class OperatorConstants {
