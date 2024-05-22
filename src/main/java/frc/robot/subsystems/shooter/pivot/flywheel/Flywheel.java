@@ -11,7 +11,7 @@ public class Flywheel extends SubsystemBase {
     private FlywheeIO io;
 
     private final SimpleMotorFeedforward realFF = new SimpleMotorFeedforward(0, 0, 0);
-    private final SimpleMotorFeedforward simFF = new SimpleMotorFeedforward(0, 0.002152917431, 0);
+    private final SimpleMotorFeedforward simFF = new SimpleMotorFeedforward(0, 0.00208, .012);
     private SimpleMotorFeedforward feedforward;
     
     private double desiredRPM = 0;
@@ -66,6 +66,6 @@ public class Flywheel extends SubsystemBase {
     }
 
     public boolean reachedSetpoint() {
-        return Math.abs(inputs.RMP - desiredRPM) <= .35;
+        return Math.abs(inputs.RMP - desiredRPM) <= 5;
     }
 }
