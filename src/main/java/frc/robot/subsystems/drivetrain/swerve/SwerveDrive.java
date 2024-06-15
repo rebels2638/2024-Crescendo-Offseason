@@ -42,7 +42,7 @@ public class SwerveDrive extends SubsystemBase{
     private final GyroIO gyroIO;
     private GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
-    private Rotation2d yaw = new Rotation2d();
+    private Rotation2d yaw = new Rotation2d(0);
 
     private SwerveDrivePoseEstimator m_poseEstimator;
 
@@ -62,10 +62,10 @@ public class SwerveDrive extends SubsystemBase{
         switch (Constants.currentMode) {
             default:
                 modules = new ModuleIO[] {
-                    new ModuleIOSIM(),
-                    new ModuleIOSIM(),
-                    new ModuleIOSIM(),
-                    new ModuleIOSIM()
+                    new ModuleIOSim(),
+                    new ModuleIOSim(),
+                    new ModuleIOSim(),
+                    new ModuleIOSim()
                 };
                 gyroIO = new GyroIO() {};
                 break;
@@ -80,9 +80,7 @@ public class SwerveDrive extends SubsystemBase{
                 new SwerveModulePosition(0, new Rotation2d()),
                 new SwerveModulePosition(0, new Rotation2d())
             },
-            new Pose2d(),
-            VecBuilder.fill(0.05, 0.05, .5),
-            VecBuilder.fill(0.5, 0.5, .1));
+            new Pose2d());
 
         odometryThread = new Notifier(this::updateOdometry);
     }
@@ -91,7 +89,6 @@ public class SwerveDrive extends SubsystemBase{
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("SwerveDrive/Gyro", gyroInputs);
 
-        prevTime = Timer.getFPGATimestamp();
 
         for (int i = 0; i < 4; i++) {
             modules[i].updateInputs(moduleInputs[i]);
@@ -112,8 +109,11 @@ public class SwerveDrive extends SubsystemBase{
                                 measuredModuleStates[1], 
                                 measuredModuleStates[2], 
                                 measuredModuleStates[3]).omegaRadiansPerSecond * (Timer.getFPGATimestamp() - prevTime));
+
+            yaw = new Rotation2d(yaw.getRadians() % (2 * Math.PI));
         }
 
+        prevTime = Timer.getFPGATimestamp();
     }
 
     @Override 
@@ -122,13 +122,32 @@ public class SwerveDrive extends SubsystemBase{
         updateInputs();
         odometryLock.unlock();
 
-        Logger.recordOutput("SwerveDrive/estimatedPose", m_poseEstimator.getEstimatedPosition());
+        m_poseEstimator.update(yaw, new SwerveModulePosition[] {
+            new SwerveModulePosition(moduleInputs[0].drivePositionMeters, new Rotation2d(moduleInputs[0].anglePositionRad)),
+            new SwerveModulePosition(moduleInputs[1].drivePositionMeters, new Rotation2d(moduleInputs[1].anglePositionRad)),
+            new SwerveModulePosition(moduleInputs[2].drivePositionMeters, new Rotation2d(moduleInputs[2].anglePositionRad)),
+            new SwerveModulePosition(moduleInputs[3].drivePositionMeters, new Rotation2d(moduleInputs[3].anglePositionRad))
+        });
+        
+        ChassisSpeeds measuredSpeeds = m_kinematics.toChassisSpeeds(
+            measuredModuleStates[0],
+            measuredModuleStates[1],
+            measuredModuleStates[2],
+            measuredModuleStates[3]);
+        
+        Logger.recordOutput("SwerveDrive/estimYaw", yaw.getRadians());
+        Logger.recordOutput("SwerveDrive/estimatedPose", new double[] {
+            m_poseEstimator.getEstimatedPosition().getTranslation().getX(),
+            m_poseEstimator.getEstimatedPosition().getTranslation().getY(),
+            m_poseEstimator.getEstimatedPosition().getRotation().getRadians()
+        });
 
         Logger.recordOutput("SwerveDrive/desiredSpeeds", desiredSpeeds);
+        Logger.recordOutput("SwerveDrive/measuredSpeeds", measuredSpeeds.omegaRadiansPerSecond);
 
         SwerveModuleState[] desiredModuleStates = m_kinematics.toSwerveModuleStates(desiredSpeeds);
         for (int i = 0; i < 4; i++) {
-            // desiredModuleStates[i] = SwerveModuleState.optimize(desiredModuleStates[i], measuredModuleStates[i].angle);
+            desiredModuleStates[i] = SwerveModuleState.optimize(desiredModuleStates[i], measuredModuleStates[i].angle);
             modules[i].setState(desiredModuleStates[i]);
         }
         Logger.recordOutput("SwerveDrive/desiredModuleStates", desiredModuleStates);
@@ -136,11 +155,11 @@ public class SwerveDrive extends SubsystemBase{
     }
 
     public void driveFeildRelative(ChassisSpeeds speeds) {
-        desiredSpeeds = speeds;
+        desiredSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, yaw);
     }
 
     public void driveRobotRelatve(ChassisSpeeds speeds) {
-        desiredSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, gyroInputs.yaw);
+        desiredSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, yaw);
     }
 
     public void resetPose(Pose2d pose) {
@@ -159,12 +178,12 @@ public class SwerveDrive extends SubsystemBase{
     private void updateOdometry() {
         odometryLock.lock();
         updateInputs();
-        m_poseEstimator.update(yaw, new SwerveModulePosition[] {
-            new SwerveModulePosition(moduleInputs[0].drivePositionMeters, new Rotation2d(moduleInputs[0].anglePositionRad)),
-            new SwerveModulePosition(moduleInputs[1].drivePositionMeters, new Rotation2d(moduleInputs[1].anglePositionRad)),
-            new SwerveModulePosition(moduleInputs[2].drivePositionMeters, new Rotation2d(moduleInputs[2].anglePositionRad)),
-            new SwerveModulePosition(moduleInputs[3].drivePositionMeters, new Rotation2d(moduleInputs[3].anglePositionRad))
-        });
+        // m_poseEstimator.update(yaw, new SwerveModulePosition[] {
+        //     new SwerveModulePosition(moduleInputs[0].drivePositionMeters, new Rotation2d(moduleInputs[0].anglePositionRad)),
+        //     new SwerveModulePosition(moduleInputs[1].drivePositionMeters, new Rotation2d(moduleInputs[1].anglePositionRad)),
+        //     new SwerveModulePosition(moduleInputs[2].drivePositionMeters, new Rotation2d(moduleInputs[2].anglePositionRad)),
+        //     new SwerveModulePosition(moduleInputs[3].drivePositionMeters, new Rotation2d(moduleInputs[3].anglePositionRad))
+        // });
         odometryLock.unlock();
     } 
 }

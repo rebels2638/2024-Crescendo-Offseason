@@ -30,11 +30,11 @@ public class AbsoluteFieldDrive extends Command {
   @Override
   public void execute()
   {
-    ChassisSpeeds sppeds = new ChassisSpeeds(
+    ChassisSpeeds speeds = new ChassisSpeeds(
                           vX.getAsDouble() * Constants.DrivetrainConstants.kMAX_SPEED_METERS_PER_SECOND, 
                           vY.getAsDouble() * Constants.DrivetrainConstants.kMAX_SPEED_METERS_PER_SECOND, 
                           heading.getAsDouble() * Constants.DrivetrainConstants.kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
-    swerve.driveFeildRelative(sppeds);
+    swerve.driveFeildRelative(speeds);
   }
 
   // Called once the command ends or is interrupted.
