@@ -30,7 +30,12 @@ public class SwerveDrive extends SubsystemBase{
         Constants.DrivetrainConstants.kBACK_RIGHT_POSITION_METERS);
 
     private ModuleIO[] modules;
-    private ModuleIOInputsAutoLogged[] moduleInputs = new ModuleIOInputsAutoLogged[4];
+    private ModuleIOInputsAutoLogged[] moduleInputs = {
+        new ModuleIOInputsAutoLogged(),
+        new ModuleIOInputsAutoLogged(),
+        new ModuleIOInputsAutoLogged(),
+        new ModuleIOInputsAutoLogged()
+    };
 
     private ChassisSpeeds desiredSpeeds = new ChassisSpeeds(0,0,0);
 
@@ -44,7 +49,12 @@ public class SwerveDrive extends SubsystemBase{
     private final Notifier odometryThread;
     private final Lock odometryLock = new ReentrantLock();
 
-    private SwerveModuleState[] measuredModuleStates = new SwerveModuleState[4];
+    private SwerveModuleState[] measuredModuleStates = {
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState()
+    };
 
     private double prevTime = Timer.getFPGATimestamp();
     
@@ -52,10 +62,10 @@ public class SwerveDrive extends SubsystemBase{
         switch (Constants.currentMode) {
             default:
                 modules = new ModuleIO[] {
-                    new ModuleIOSim(),
-                    new ModuleIOSim(),
-                    new ModuleIOSim(),
-                    new ModuleIOSim()
+                    new ModuleIOSIM(),
+                    new ModuleIOSIM(),
+                    new ModuleIOSIM(),
+                    new ModuleIOSIM()
                 };
                 gyroIO = new GyroIO() {};
                 break;
@@ -64,7 +74,12 @@ public class SwerveDrive extends SubsystemBase{
         m_poseEstimator = new SwerveDrivePoseEstimator(
             m_kinematics,
             new Rotation2d(),
-            new SwerveModulePosition[4],
+            new SwerveModulePosition[] {
+                new SwerveModulePosition(0, new Rotation2d()),
+                new SwerveModulePosition(0, new Rotation2d()),
+                new SwerveModulePosition(0, new Rotation2d()),
+                new SwerveModulePosition(0, new Rotation2d())
+            },
             new Pose2d(),
             VecBuilder.fill(0.05, 0.05, .5),
             VecBuilder.fill(0.5, 0.5, .1));
@@ -75,6 +90,17 @@ public class SwerveDrive extends SubsystemBase{
     private void updateInputs() {
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("SwerveDrive/Gyro", gyroInputs);
+
+        prevTime = Timer.getFPGATimestamp();
+
+        for (int i = 0; i < 4; i++) {
+            modules[i].updateInputs(moduleInputs[i]);
+            Logger.processInputs("SwerveDrive/Module" + i, moduleInputs[i]);
+
+            measuredModuleStates[i].angle = new Rotation2d(moduleInputs[i].anglePositionRad);
+            measuredModuleStates[i].speedMetersPerSecond = moduleInputs[i].driveVelocityMps;
+        }
+        Logger.recordOutput("SwerveDrive/measuredModuleStates", measuredModuleStates);
 
         if (gyroInputs.isConnected) {
             yaw = gyroInputs.yaw;
@@ -87,17 +113,7 @@ public class SwerveDrive extends SubsystemBase{
                                 measuredModuleStates[2], 
                                 measuredModuleStates[3]).omegaRadiansPerSecond * (Timer.getFPGATimestamp() - prevTime));
         }
-        prevTime = Timer.getFPGATimestamp();
 
-        measuredModuleStates = new SwerveModuleState[4];
-        for (int i = 0; i < 4; i++) {
-            modules[i].updateInputs(moduleInputs[i]);
-            Logger.processInputs("SwerveDrive/Module" + i, moduleInputs[i]);
-
-            measuredModuleStates[i].angle = new Rotation2d(moduleInputs[i].anglePositionRad);
-            measuredModuleStates[i].speedMetersPerSecond = moduleInputs[i].driveVelocityMps;
-        }
-        Logger.recordOutput("SwerveDrive/measuredModuleStates", measuredModuleStates);
     }
 
     @Override 
@@ -108,9 +124,11 @@ public class SwerveDrive extends SubsystemBase{
 
         Logger.recordOutput("SwerveDrive/estimatedPose", m_poseEstimator.getEstimatedPosition());
 
+        Logger.recordOutput("SwerveDrive/desiredSpeeds", desiredSpeeds);
+
         SwerveModuleState[] desiredModuleStates = m_kinematics.toSwerveModuleStates(desiredSpeeds);
         for (int i = 0; i < 4; i++) {
-            desiredModuleStates[i] = SwerveModuleState.optimize(desiredModuleStates[i], measuredModuleStates[i].angle);
+            // desiredModuleStates[i] = SwerveModuleState.optimize(desiredModuleStates[i], measuredModuleStates[i].angle);
             modules[i].setState(desiredModuleStates[i]);
         }
         Logger.recordOutput("SwerveDrive/desiredModuleStates", desiredModuleStates);

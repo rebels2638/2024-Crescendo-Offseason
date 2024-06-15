@@ -49,10 +49,10 @@ public final class Constants {
 
 
     // x, y from center of the robot
-    public static final Translation2d kFRONT_RIGHT_POSITION_METERS = new Translation2d(1, 1);
-    public static final Translation2d kBACK_RIGHT_POSITION_METERS = new Translation2d(1, -1);
-    public static final Translation2d kFRONT_LEFT_POSITION_METERS = new Translation2d(-1, 1);
-    public static final Translation2d kBACK_LEFT_POSITION_METERS = new Translation2d(-1, -1);
+    public static final Translation2d kFRONT_RIGHT_POSITION_METERS = new Translation2d(0.38, -0.38);
+    public static final Translation2d kBACK_RIGHT_POSITION_METERS = new Translation2d(-0.38, -0.38);
+    public static final Translation2d kFRONT_LEFT_POSITION_METERS = new Translation2d(0.38, 0.38);
+    public static final Translation2d kBACK_LEFT_POSITION_METERS = new Translation2d(-0.38, 0.38);
 
     public static final double kFRONT_RIGHT_ANGLE_OFFSET_DEG = 20;
     public static final double kBACK_RIGHT_ANGLE_OFFSET_DEG = 20;

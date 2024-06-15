@@ -10,18 +10,18 @@ import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import frc.robot.Constants;
 import frc.robot.lib.util.RebelUtil;
 
-public class ModuleIOSim implements ModuleIO {
+public class ModuleIOSIM implements ModuleIO {
     private DCMotor m_gearBoxAngle = DCMotor.getFalcon500Foc(1);
     private DCMotor m_gearBoxDrive = DCMotor.getFalcon500Foc(1);
 
-    private FlywheelSim m_angleSim = new FlywheelSim(m_gearBoxAngle, Constants.DrivetrainConstants.kANGLE_MOTOR_TO_OUTPUT_SHAFT_RATIO, 0.007);
-    private FlywheelSim m_driveSim = new FlywheelSim(m_gearBoxDrive, Constants.DrivetrainConstants.kDRIVE_MOTOR_TO_OUTPUT_SHAFT_RATIO, 0.007);
+    private FlywheelSim m_angleSim = new FlywheelSim(m_gearBoxAngle, 1, 0.007);
+    private FlywheelSim m_driveSim = new FlywheelSim(m_gearBoxDrive, 1, 0.007);
     
-    private static final PIDController m_angleFeedbackController = new PIDController(1, 0, 0);
-    private static final PIDController m_driveFeedbackController = new PIDController(1, 0, 0);
+    private static final PIDController m_angleFeedbackController = new PIDController(0.003, 0, 0.0000);
+    private static final PIDController m_driveFeedbackController = new PIDController(0.001, 0, 0);
 
     private static final SimpleMotorFeedforward m_angleFeedforward = new SimpleMotorFeedforward(0, 0);
-    private static final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0, 0);
+    private static final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0, 0.00197, 0.00);
     
     private double m_angleVoltage = 0;
     private double m_driveVoltage = 0;
@@ -30,11 +30,16 @@ public class ModuleIOSim implements ModuleIO {
     private double drivePositionsMeters = 0;
 
     private double prevTime = Timer.getFPGATimestamp();
+
+    public ModuleIOSIM() {
+        m_angleFeedbackController.setTolerance(Math.toRadians(3));
+        m_driveFeedbackController.setTolerance(0.01);
+    }
     
     @Override 
     public void updateInputs(ModuleIOInputs inputs) {
-        m_angleSim.update(0.020);
-        m_driveSim.update(0.020);
+        m_angleSim.update(Timer.getFPGATimestamp() - prevTime);
+        m_driveSim.update(Timer.getFPGATimestamp() - prevTime);
 
         inputs.angleVelocityRadPerSec = m_angleSim.getAngularVelocityRPM();
         inputs.driveVelocityMps = m_driveSim.getAngularVelocityRPM();
@@ -60,7 +65,7 @@ public class ModuleIOSim implements ModuleIO {
     @Override
     public void setState(SwerveModuleState state) {
         double speed = state.speedMetersPerSecond;
-        m_driveVoltage = m_driveFeedforward.calculate(speed, Math.signum(speed)) + 
+        m_driveVoltage = m_driveFeedforward.calculate(speed, Math.signum(speed - m_driveSim.getAngularVelocityRPM())) + 
                          m_driveFeedbackController.calculate(m_driveSim.getAngularVelocityRPM(), speed);
 
         m_driveVoltage = RebelUtil.constrain(
@@ -70,7 +75,7 @@ public class ModuleIOSim implements ModuleIO {
         m_driveSim.setInputVoltage(m_driveVoltage);
 
         double angle = state.angle.getRadians();
-        m_angleVoltage = m_angleFeedforward.calculate(angle, Math.signum(angle)) + 
+        m_angleVoltage = m_angleFeedforward.calculate(angle, Math.signum(angle - anglePositionRad)) + 
                          m_angleFeedbackController.calculate(anglePositionRad, angle);
 
         m_angleVoltage = RebelUtil.constrain(

@@ -4,6 +4,11 @@
       "/FMSInfo": "FMSInfo"
     }
   },
+  "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    }
+  },
   "NetworkTables Info": {
     "visible": true
   }
