@@ -8,7 +8,7 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
 public class FlywheeIOInputsAutoLogged extends FlywheeIO.FlywheeIOInputs implements LoggableInputs, Cloneable {
   @Override
   public void toLog(LogTable table) {
-    table.put("RMP", RMP);
+    table.put("RPM", RPM);
     table.put("TTemp", tTemp);
     table.put("BTemp", bTemp);
     table.put("TAmps", tAmps);
@@ -19,7 +19,7 @@ public class FlywheeIOInputsAutoLogged extends FlywheeIO.FlywheeIOInputs impleme
 
   @Override
   public void fromLog(LogTable table) {
-    RMP = table.get("RMP", RMP);
+    RPM = table.get("RPM", RPM);
     tTemp = table.get("TTemp", tTemp);
     bTemp = table.get("BTemp", bTemp);
     tAmps = table.get("TAmps", tAmps);
@@ -30,7 +30,7 @@ public class FlywheeIOInputsAutoLogged extends FlywheeIO.FlywheeIOInputs impleme
 
   public FlywheeIOInputsAutoLogged clone() {
     FlywheeIOInputsAutoLogged copy = new FlywheeIOInputsAutoLogged();
-    copy.RMP = this.RMP;
+    copy.RPM = this.RPM;
     copy.tTemp = this.tTemp;
     copy.bTemp = this.bTemp;
     copy.tAmps = this.tAmps;

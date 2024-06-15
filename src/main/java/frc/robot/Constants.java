@@ -31,25 +31,41 @@ public final class Constants {
   }
   
   public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
+    public static final int kDRIVER_CONTROLLER_PORT = 0;
+
+    // Joystick Deadband
+    // yes, this high
+    public static final double LEFT_X_DEADBAND = 0.09;
+    public static final double LEFT_Y_DEADBAND = 0.09;
+    
+    public static final double RIGHT_X_DEADBAND = 0.09;
+    
   }
   public static class DrivetrainConstants {
+    public static final double kMAX_SPEED_METERS_PER_SECOND = 3;
+    public static final double kMAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3;
+    public static final double kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
+    public static final double kMAX_ANGULAR_ACCELERATION_RADIANS_PER_SECOND_SQUARED = Math.PI;
+
+
     // x, y from center of the robot
+    public static final Translation2d kFRONT_RIGHT_POSITION_METERS = new Translation2d(1, 1);
+    public static final Translation2d kBACK_RIGHT_POSITION_METERS = new Translation2d(1, -1);
+    public static final Translation2d kFRONT_LEFT_POSITION_METERS = new Translation2d(-1, 1);
+    public static final Translation2d kBACK_LEFT_POSITION_METERS = new Translation2d(-1, -1);
 
-    public static final Translation2d frontRightPositionMeters = new Translation2d(1, 1);
-    public static final Translation2d backRightPositionMeters = new Translation2d(1, -1);
-    public static final Translation2d frontLeftPositionMeters = new Translation2d(-1, 1);
-    public static final Translation2d backLeftPositionMeters = new Translation2d(-1, -1);
+    public static final double kFRONT_RIGHT_ANGLE_OFFSET_DEG = 20;
+    public static final double kBACK_RIGHT_ANGLE_OFFSET_DEG = 20;
+    public static final double kFRONT_LEFT_ANGLE_OFFSET_DEG = 20;
+    public static final double kBACK_LEFT_ANGLE_OFFSET_DEG = 20;
 
-    public static final double frontRightAngleOffsetDeg = 20;
-    public static final double backRightAngleOffsetDeg = 20;
-    public static final double frontLeftAngleOffsetDeg = 20;
-    public static final double backLeftAngleOffsetDeg = 20;
+    public static final double kDRIVE_MOTOR_TO_OUTPUT_SHAFT_RATIO = .23;
+    public static final double kANGLE_MOTOR_TO_OUTPUT_SHAFT_RATIO = .23;
 
-    public static final double driveMotorOutputToShaftRatio = .23;
-    public static final double angleMotorOutputToShaftRatio = .23;
+    public static final double kDRIVE_WHEEL_RADIUS_METERS = .1;
 
-    public static final double driveWheelRadiusMeters = .1;
+    public static final double kMAX_ANGLE_VOLTAGE = 12;
+    public static final double kMAX_DRIVE_VOLTAGE = 12;
 
 
   }

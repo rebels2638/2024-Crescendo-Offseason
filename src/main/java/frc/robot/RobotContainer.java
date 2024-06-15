@@ -1,8 +1,14 @@
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
+import frc.robot.commands.drivetrain.AbsoluteFieldDrive;
 import frc.robot.commands.shooter.ShooterStop;
 import frc.robot.commands.shooter.ShooterWindup;
 import frc.robot.lib.input.XboxController;
+import frc.robot.subsystems.drivetrain.swerve.GyroIO;
+import frc.robot.subsystems.drivetrain.swerve.ModuleIO;
+import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
 import frc.robot.subsystems.shooter.pivot.flywheel.Flywheel;
 
 public class RobotContainer {
@@ -14,12 +20,21 @@ public class RobotContainer {
 
   private Flywheel flywheelSubsystem;
 
+  private SwerveDrive swerveDrive;
+
   public RobotContainer() {
     this.xboxTester = new XboxController(1);
     this.xboxOperator = new XboxController(2);
     this.xboxDriver = new XboxController(3);
 
+    
+    swerveDrive = new SwerveDrive();
     flywheelSubsystem = new Flywheel();
+
+    swerveDrive.setDefaultCommand(new AbsoluteFieldDrive(swerveDrive, 
+    () -> MathUtil.applyDeadband(xboxDriver.getLeftY(), Constants.OperatorConstants.LEFT_Y_DEADBAND),
+    () -> MathUtil.applyDeadband(xboxDriver.getLeftX(), Constants.OperatorConstants.LEFT_X_DEADBAND),
+    () -> MathUtil.applyDeadband(xboxDriver.getRightX(), Constants.OperatorConstants.RIGHT_X_DEADBAND)));
 
     xboxOperator.getAButton().whileTrue(new ShooterWindup(flywheelSubsystem));
     xboxOperator.getAButton().whileFalse(new ShooterStop(flywheelSubsystem));

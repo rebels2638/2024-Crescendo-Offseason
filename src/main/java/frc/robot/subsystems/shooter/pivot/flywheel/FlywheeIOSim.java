@@ -21,7 +21,7 @@ public class FlywheeIOSim implements FlywheeIO{
         m_topSim.update(0.020);
         m_bottomSim.update(0.020);
 
-        inputs.RMP = m_topSim.getAngularVelocityRPM();
+        inputs.RPM = m_topSim.getAngularVelocityRPM();
 
         inputs.tAmps = m_topSim.getCurrentDrawAmps();
         inputs.bAmps = m_bottomSim.getCurrentDrawAmps();

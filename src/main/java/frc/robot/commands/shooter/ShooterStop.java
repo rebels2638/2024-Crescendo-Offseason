@@ -14,7 +14,7 @@ public class ShooterStop extends Command {
 
     @Override
     public void initialize() {
-        flywheelSubsystem.setRMP(0);
+        flywheelSubsystem.setRPM(0);
     }
 
     @Override

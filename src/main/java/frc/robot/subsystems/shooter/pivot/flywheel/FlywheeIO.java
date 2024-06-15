@@ -5,7 +5,7 @@ import org.littletonrobotics.junction.AutoLog;
 public interface FlywheeIO {
     @AutoLog
     public static class FlywheeIOInputs {
-        public double RMP;
+        public double RPM;
         
         public double tTemp;
         public double bTemp;

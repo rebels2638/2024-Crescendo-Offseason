@@ -14,7 +14,7 @@ public class ShooterWindup extends Command {
 
     @Override
     public void initialize() {
-        flywheelSubsystem.setRMP(170);
+        flywheelSubsystem.setRPM(170);
     }
 
     @Override

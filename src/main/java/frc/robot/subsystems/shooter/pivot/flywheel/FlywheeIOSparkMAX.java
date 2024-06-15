@@ -20,7 +20,7 @@ public class FlywheeIOSparkMAX implements FlywheeIO{
 
     @Override
     public void updateInputs(FlywheeIOInputs inputs) {
-        inputs.RMP = m_motorT.getEncoder().getVelocity() * kMOTOR_TO_OUTPUT_RATIO;
+        inputs.RPM = m_motorT.getEncoder().getVelocity() * kMOTOR_TO_OUTPUT_RATIO;
 
         inputs.tAmps = m_motorT.getOutputCurrent();
         inputs.bAmps = m_motorB.getOutputCurrent();
