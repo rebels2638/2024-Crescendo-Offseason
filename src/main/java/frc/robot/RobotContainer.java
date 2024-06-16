@@ -1,6 +1,8 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.AutoRunner;
 import frc.robot.commands.drivetrain.AbsoluteFieldDrive;
 import frc.robot.commands.shooter.ShooterStop;
 import frc.robot.commands.shooter.ShooterWindup;
@@ -19,6 +21,8 @@ public class RobotContainer {
 
   private SwerveDrive swerveDrive;
 
+  private AutoRunner autoRunner;
+
   public RobotContainer() {
     this.xboxTester = new XboxController(1);
     this.xboxOperator = new XboxController(2);
@@ -28,6 +32,8 @@ public class RobotContainer {
     swerveDrive = new SwerveDrive();
     flywheelSubsystem = new Flywheel();
 
+    autoRunner = new AutoRunner(swerveDrive);
+    
     swerveDrive.setDefaultCommand(new AbsoluteFieldDrive(swerveDrive, 
     () -> MathUtil.applyDeadband(xboxDriver.getLeftY(), Constants.OperatorConstants.LEFT_Y_DEADBAND),
     () -> MathUtil.applyDeadband(xboxDriver.getLeftX(), Constants.OperatorConstants.LEFT_X_DEADBAND),
@@ -45,5 +51,13 @@ public class RobotContainer {
     return instance;
   }
   
+  public Command getAutonomousCommand() {
+    return autoRunner.getAutonomousCommand();
+  }
+
+  public String getSelectedAuto() {
+    return autoRunner.getSelectedAutoName();
+  }
+
 }
 

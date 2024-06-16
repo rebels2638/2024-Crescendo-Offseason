@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drivetrain.swerve;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -16,10 +18,10 @@ public class ModuleIOSim implements ModuleIO {
     private FlywheelSim m_angleSim = new FlywheelSim(m_gearBoxAngle, 1, 0.001);
     private FlywheelSim m_driveSim = new FlywheelSim(m_gearBoxDrive, 1, 0.007);
     
-    private static final PIDController m_angleFeedbackController = new PIDController(0.007, 0, 0.0002);
+    private static final PIDController m_angleFeedbackController = new PIDController(0.007, 0.0, 0.0002);
     private static final PIDController m_driveFeedbackController = new PIDController(0.001, 0, 0);
 
-    private static final SimpleMotorFeedforward m_angleFeedforward = new SimpleMotorFeedforward(0, 0);
+    private static final SimpleMotorFeedforward m_angleFeedforward = new SimpleMotorFeedforward(0, 0.0000);
     private static final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0, 0.00197, 0.00);
     
     private double m_angleVoltage = 0;
@@ -66,7 +68,7 @@ public class ModuleIOSim implements ModuleIO {
     }
 
     @Override
-    public void setState(SwerveModuleState state) {
+    public void setState(SwerveModuleState state, double nextAngle) {
         double speed = state.speedMetersPerSecond;
         m_driveVoltage = m_driveFeedforward.calculate(speed, Math.signum(speed - m_driveSim.getAngularVelocityRPM())) + 
                          m_driveFeedbackController.calculate(m_driveSim.getAngularVelocityRPM(), speed);
@@ -78,7 +80,7 @@ public class ModuleIOSim implements ModuleIO {
         m_driveSim.setInputVoltage(m_driveVoltage);
 
         double angle = state.angle.getRadians();
-        m_angleVoltage = m_angleFeedforward.calculate(angle, Math.signum(angle - anglePositionRad)) + 
+        m_angleVoltage = m_angleFeedforward.calculate(0, Math.signum(angle - anglePositionRad)) + 
                          m_angleFeedbackController.calculate(anglePositionRad, angle);
 
         m_angleVoltage = RebelUtil.constrain(
