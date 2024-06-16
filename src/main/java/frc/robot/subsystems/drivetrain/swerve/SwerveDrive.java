@@ -133,17 +133,17 @@ public class SwerveDrive extends SubsystemBase{
         updateInputs();
         odometryLock.unlock();
 
-        if (DriverStation.isAutonomous()) {
-            // type PathPlannerAuto
-            String name = RobotContainer.getInstance().getSelectedAuto();
-            // PathPlannerAuto auto = (PathPlannerAuto) RobotContainer.getInstance().getAutonomousCommand();
-            // auto.initialize();
-            // List<PathPlannerPath> paths = PathPlannerAuto.getPathGroupFromAutoFile(name);
+        // if (DriverStation.isAutonomous()) {
+        //     // type PathPlannerAuto
+        //     String name = RobotContainer.getInstance().getSelectedAuto();
+        //     // PathPlannerAuto auto = (PathPlannerAuto) RobotContainer.getInstance().getAutonomousCommand();
+        //     // auto.initialize();
+        //     // List<PathPlannerPath> paths = PathPlannerAuto.getPathGroupFromAutoFile(name);
             
-            Command auto = AutoBuilder.buildAuto(name);
-            CommandScheduler.getInstance().
+        //     Command auto = AutoBuilder.buildAuto(name);
+        //     CommandScheduler.getInstance().
            
-        }
+        // }
 
         m_poseEstimator.update(yaw, new SwerveModulePosition[] {
             new SwerveModulePosition(moduleInputs[0].drivePositionMeters, new Rotation2d(moduleInputs[0].anglePositionRad)),
