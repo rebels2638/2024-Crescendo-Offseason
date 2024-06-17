@@ -1,17 +1,14 @@
 package frc.robot.subsystems.drivetrain.swerve;
 
-import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.PathPlannerTrajectory;
-import com.pathplanner.lib.util.PPLibTelemetry;
+import com.ctre.phoenix6.sim.ChassisReference;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,15 +17,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Robot;
-import frc.robot.RobotContainer;
 
 public class SwerveDrive extends SubsystemBase{
 
@@ -60,6 +52,9 @@ public class SwerveDrive extends SubsystemBase{
 
     private ChassisSpeeds measuredRobotRelativeSpeeds = new ChassisSpeeds(0,0,0);
 
+    private PIDController m_angleFeedbackController = new PIDController(0.00, 0.0, 0.000);
+    private SimpleMotorFeedforward m_angleFeedForwardController = new SimpleMotorFeedforward(0, 1);
+
     private SwerveModuleState[] measuredModuleStates = {
         new SwerveModuleState(),
         new SwerveModuleState(),
@@ -71,7 +66,7 @@ public class SwerveDrive extends SubsystemBase{
     
     public SwerveDrive() {
         switch (Constants.currentMode) {
-            default:
+            case SIM:
                 modules = new ModuleIO[] {
                     new ModuleIOSim(),
                     new ModuleIOSim(),
@@ -80,6 +75,16 @@ public class SwerveDrive extends SubsystemBase{
                 };
                 gyroIO = new GyroIO() {};
                 break;
+            default:
+                modules = new ModuleIO[] {
+                    new ModuleIOTalon(0),
+                    new ModuleIOTalon(1),
+                    new ModuleIOTalon(2),
+                    new ModuleIOTalon(3)
+                };
+                gyroIO = new GyroIONavex();
+                break;
+
         }
 
         m_poseEstimator = new SwerveDrivePoseEstimator(
@@ -168,7 +173,14 @@ public class SwerveDrive extends SubsystemBase{
         Logger.recordOutput("SwerveDrive/desiredRobotRelativeSpeeds", desiredRobotRelativeSpeeds);
         Logger.recordOutput("SwerveDrive/measuredRobotRelativeSpeeds", measuredRobotRelativeSpeeds);
 
-        SwerveModuleState[] desiredModuleStates = m_kinematics.toSwerveModuleStates(desiredRobotRelativeSpeeds);
+        ChassisSpeeds correctedSpeeds = desiredRobotRelativeSpeeds;
+        correctedSpeeds.omegaRadiansPerSecond = 
+            m_angleFeedForwardController.calculate(desiredRobotRelativeSpeeds.omegaRadiansPerSecond, Math.signum(desiredRobotRelativeSpeeds.omegaRadiansPerSecond - measuredRobotRelativeSpeeds.omegaRadiansPerSecond)) + 
+            m_angleFeedbackController.calculate(measuredRobotRelativeSpeeds.omegaRadiansPerSecond, desiredRobotRelativeSpeeds.omegaRadiansPerSecond);
+
+        Logger.recordOutput("SwerveDrive/correctedSpeeds", correctedSpeeds);
+
+        SwerveModuleState[] desiredModuleStates = m_kinematics.toSwerveModuleStates(correctedSpeeds);
         for (int i = 0; i < 4; i++) {
             desiredModuleStates[i] = SwerveModuleState.optimize(desiredModuleStates[i], measuredModuleStates[i].angle);
             modules[i].setState(desiredModuleStates[i], 0);

@@ -71,7 +71,7 @@ public final class Constants {
   public static class DrivetrainConstants {
     public static final double kMAX_SPEED_METERS_PER_SECOND = 4;
     public static final double kMAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2;
-    public static final double kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 4 * Math.PI;
+    public static final double kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
     public static final double kMAX_ANGULAR_ACCELERATION_RADIANS_PER_SECOND_SQUARED = 2 * Math.PI;
 
 

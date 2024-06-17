@@ -45,7 +45,7 @@ public class ModuleIOSim implements ModuleIO {
         m_driveSim.update(Timer.getFPGATimestamp() - prevTime);
 
         inputs.angleVelocityRadPerSec = m_angleSim.getAngularVelocityRPM();
-        inputs.driveVelocityMps = m_driveSim.getAngularVelocityRPM();
+        inputs.driveVelocityMps = m_driveSim.getAngularVelocityRPM() * Constants.DrivetrainConstants.kDRIVE_WHEEL_RADIUS_METERS * 2 * Math.PI;
         
         anglePositionRad += inputs.angleVelocityRadPerSec * (Timer.getFPGATimestamp() - prevTime);
         drivePositionsMeters += inputs.driveVelocityMps * (Timer.getFPGATimestamp() - prevTime);
