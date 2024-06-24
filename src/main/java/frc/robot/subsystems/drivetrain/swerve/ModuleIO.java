@@ -26,4 +26,5 @@ public interface ModuleIO {
     public default void updateInputs(ModuleIOInputs inputs) {}
     public default void setState(SwerveModuleState state, double nextAngle) {}
     public default void resetPosition() {}
+    public default void queueSynchronizeEncoders() {}
 }

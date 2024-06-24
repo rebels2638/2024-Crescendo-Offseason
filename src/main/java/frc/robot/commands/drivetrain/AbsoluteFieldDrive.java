@@ -34,7 +34,7 @@ public class AbsoluteFieldDrive extends Command {
                           vX.getAsDouble() * Constants.DrivetrainConstants.kMAX_SPEED_METERS_PER_SECOND, 
                           vY.getAsDouble() * Constants.DrivetrainConstants.kMAX_SPEED_METERS_PER_SECOND, 
                           heading.getAsDouble() * Constants.DrivetrainConstants.kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND);
-    swerve.driveFeildRelative(speeds);
+    swerve.driveFieldRelative(speeds);
   }
 
   // Called once the command ends or is interrupted.

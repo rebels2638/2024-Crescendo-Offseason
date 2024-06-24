@@ -34,6 +34,7 @@ public class ModuleIOTalon implements ModuleIO {
     private double driveVelocityMps = 0;
 
     private CANcoder angleEncoder;
+    private boolean syncQueued = false;
 
     public ModuleIOTalon(int id) {
         CANcoderConfiguration endocerConfig = new CANcoderConfiguration();
@@ -79,14 +80,14 @@ public class ModuleIOTalon implements ModuleIO {
 
         m_angleFeedbackController.enableContinuousInput(0, 2 * Math.PI);
     }
+
+    @Override
+    public void queueSynchronizeEncoders() {
+        if (angleEncoder != null) {syncQueued = true;}
+    }
     
     @Override 
     public void updateInputs(ModuleIOInputs inputs) {
-
-        // sync encoders
-        if (angleEncoder.getMagnetHealth().getValue() == MagnetHealthValue.Magnet_Green) {
-            m_angle.setPosition(angleEncoder.getAbsolutePosition().getValueAsDouble());
-        }
 
         inputs.angleVelocityRadPerSec = m_angle.getVelocity().getValueAsDouble() * 2 * Math.PI;
         inputs.driveVelocityMps = m_drive.getVelocity().getValueAsDouble() * 2 * Math.PI * Constants.DrivetrainConstants.kDRIVE_WHEEL_RADIUS_METERS * Constants.DrivetrainConstants.kDRIVE_MOTOR_TO_OUTPUT_SHAFT_RATIO;
@@ -122,6 +123,11 @@ public class ModuleIOTalon implements ModuleIO {
                          Constants.DrivetrainConstants.kMAX_DRIVE_VOLTAGE);
 
         m_drive.setVoltage(m_driveVoltage);
+
+        if (angleEncoder != null && angleEncoder.getMagnetHealth().getValue() == MagnetHealthValue.Magnet_Green && syncQueued) {
+            m_angle.setPosition(angleEncoder.getAbsolutePosition().getValueAsDouble());
+            syncQueued = false;
+        }
 
         double angle = state.angle.getRadians();
         m_angleVoltage = m_angleFeedforward.calculate(0, Math.signum(angle - anglePositionRad)) + 

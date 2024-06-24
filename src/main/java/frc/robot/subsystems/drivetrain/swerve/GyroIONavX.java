@@ -6,11 +6,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 
-public class GyroIONavex implements GyroIO {
+public class GyroIONavX implements GyroIO {
     private AHRS gyro;
     private Rotation3d offset = new Rotation3d();
     
-    public GyroIONavex() {
+    public GyroIONavX() {
         try {
             gyro = new AHRS(Port.kMXP);
         }
@@ -41,7 +41,5 @@ public class GyroIONavex implements GyroIO {
     public void reset(Rotation3d inital) {
         offset = gyro.getRotation3d().plus(inital);
     }
-
-    
 
 }
