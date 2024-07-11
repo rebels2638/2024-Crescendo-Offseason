@@ -200,7 +200,7 @@ public class SwerveDrive extends SubsystemBase{
             desiredModuleStates[i] = SwerveModuleState.optimize(desiredModuleStates[i], measuredModuleStates[i].angle);
             modules[i].setState(desiredModuleStates[i], 0);
         }
-        
+
         Logger.recordOutput("SwerveDrive/desiredModuleStates", desiredModuleStates);
     }
 
@@ -281,9 +281,5 @@ public class SwerveDrive extends SubsystemBase{
         m_poseEstimator.resetPosition(gyroInputs.yaw, getSwerveModulePositions(), getPose());
         odometryLock.unlock();
         m_kinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0, gyroInputs.yaw)); // TODO: this is yaw in radians right?
-    }
-
-    private double ffFunction(double vx, double omega) {
-        return 0.131207 * vx * vx * vx + -1.06569 * vx * vx + 2.52463 * vx + -0.272947 * omega * omega * omega + -6.37258 * omega * omega + -6.37258 * omega + 0.0673372; 
     }
 }
