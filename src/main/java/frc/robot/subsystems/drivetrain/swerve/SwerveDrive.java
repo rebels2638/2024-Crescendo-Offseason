@@ -1,5 +1,8 @@
 package frc.robot.subsystems.drivetrain.swerve;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -19,7 +22,6 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.drivetrain.swerve.GyroIO.GyroIOInputs;
 
 public class SwerveDrive extends SubsystemBase{
 
@@ -38,6 +40,7 @@ public class SwerveDrive extends SubsystemBase{
     };
 
     private ChassisSpeeds desiredRobotRelativeSpeeds = new ChassisSpeeds(0,0,0);
+    private ChassisSpeeds desiredFeildRelativeSpeeds = new ChassisSpeeds(0,0,0);
 
     private final GyroIO gyroIO;
     private GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -52,9 +55,12 @@ public class SwerveDrive extends SubsystemBase{
     private final Lock odometryLock = new ReentrantLock();
 
     private ChassisSpeeds measuredRobotRelativeSpeeds = new ChassisSpeeds(0,0,0);
+    private ChassisSpeeds measuredFeildRelativeSpeeds = new ChassisSpeeds(0,0,0);
 
     private PIDController m_angleFeedbackController = new PIDController(0.00, 0.0, 0.000);
     private SimpleMotorFeedforward m_angleFeedForwardController = new SimpleMotorFeedforward(0, 1);
+
+    private PIDController m_translationalFeedbackController = new PIDController(0.00, 0.0, 0.000);
 
     private SwerveModuleState[] measuredModuleStates = {
         new SwerveModuleState(),
@@ -140,6 +146,8 @@ public class SwerveDrive extends SubsystemBase{
         updateOdometry();
         odometryLock.unlock();
 
+        
+        
         // if (DriverStation.isAutonomous()) {
         //     // type PathPlannerAuto
         //     String name = RobotContainer.getInstance().getSelectedAuto();
@@ -164,6 +172,8 @@ public class SwerveDrive extends SubsystemBase{
             measuredModuleStates[1],
             measuredModuleStates[2],
             measuredModuleStates[3]);
+
+        measuredFeildRelativeSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(measuredRobotRelativeSpeeds, yaw);
         
         Logger.recordOutput("SwerveDrive/estimYaw", yaw.getRadians());
         Logger.recordOutput("SwerveDrive/estimatedPose", new double[] {
@@ -174,6 +184,9 @@ public class SwerveDrive extends SubsystemBase{
 
         Logger.recordOutput("SwerveDrive/desiredRobotRelativeSpeeds", desiredRobotRelativeSpeeds);
         Logger.recordOutput("SwerveDrive/measuredRobotRelativeSpeeds", measuredRobotRelativeSpeeds);
+        Logger.recordOutput("SwerveDrive/desiredFeildRelativeSpeeds", desiredFeildRelativeSpeeds);
+        Logger.recordOutput("SwerveDrive/measuredFeildRelativeSpeeds", measuredFeildRelativeSpeeds);
+
 
         ChassisSpeeds correctedSpeeds = desiredRobotRelativeSpeeds;
         correctedSpeeds.omegaRadiansPerSecond = 
@@ -187,11 +200,12 @@ public class SwerveDrive extends SubsystemBase{
             desiredModuleStates[i] = SwerveModuleState.optimize(desiredModuleStates[i], measuredModuleStates[i].angle);
             modules[i].setState(desiredModuleStates[i], 0);
         }
+        
         Logger.recordOutput("SwerveDrive/desiredModuleStates", desiredModuleStates);
-
     }
 
     public void driveFieldRelative(ChassisSpeeds speeds) {
+        desiredFeildRelativeSpeeds = speeds;
         desiredRobotRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, yaw);
     }
 
@@ -267,5 +281,9 @@ public class SwerveDrive extends SubsystemBase{
         m_poseEstimator.resetPosition(gyroInputs.yaw, getSwerveModulePositions(), getPose());
         odometryLock.unlock();
         m_kinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0, gyroInputs.yaw)); // TODO: this is yaw in radians right?
+    }
+
+    private double ffFunction(double vx, double omega) {
+        return 0.131207 * vx * vx * vx + -1.06569 * vx * vx + 2.52463 * vx + -0.272947 * omega * omega * omega + -6.37258 * omega * omega + -6.37258 * omega + 0.0673372; 
     }
 }

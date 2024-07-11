@@ -13,14 +13,14 @@ public class ModuleIOSim implements ModuleIO {
     private DCMotor m_gearBoxAngle = DCMotor.getFalcon500Foc(1);
     private DCMotor m_gearBoxDrive = DCMotor.getFalcon500Foc(1);
 
-    private FlywheelSim m_angleSim = new FlywheelSim(m_gearBoxAngle, 1, 0.001);
-    private FlywheelSim m_driveSim = new FlywheelSim(m_gearBoxDrive, 1, 0.007);
+    private FlywheelSim m_angleSim = new FlywheelSim(m_gearBoxAngle, 1, 0.0001);
+    private FlywheelSim m_driveSim = new FlywheelSim(m_gearBoxDrive, 1, 0.003);
     
-    private static final PIDController m_angleFeedbackController = new PIDController(0.007, 0.0, 0.0002);
+    private static final PIDController m_angleFeedbackController = new PIDController(0.06, 0.0, 0.0002);
     private static final PIDController m_driveFeedbackController = new PIDController(0.001, 0, 0);
 
     private static final SimpleMotorFeedforward m_angleFeedforward = new SimpleMotorFeedforward(0, 0.0000);
-    private static final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0, 0.00197, 0.00);
+    private static final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0, 0.00365, 0.00);
     
     private double m_angleVoltage = 0;
     private double m_driveVoltage = 0;
