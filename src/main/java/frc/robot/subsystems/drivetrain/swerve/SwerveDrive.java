@@ -8,12 +8,14 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.InterpolatingMatrixTreeMap;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -57,10 +59,10 @@ public class SwerveDrive extends SubsystemBase{
     private ChassisSpeeds measuredRobotRelativeSpeeds = new ChassisSpeeds(0,0,0);
     private ChassisSpeeds measuredFeildRelativeSpeeds = new ChassisSpeeds(0,0,0);
 
-    private PIDController m_angleFeedbackController = new PIDController(0.00, 0.0, 0.000);
-    private SimpleMotorFeedforward m_angleFeedForwardController = new SimpleMotorFeedforward(0, 1);
+    private PIDController m_angleFeedbackController;
+    private DriveFFController driveFFController;
 
-    private PIDController m_translationalFeedbackController = new PIDController(0.00, 0.0, 0.000);
+    private PIDController m_translationalFeedbackController;
 
     private SwerveModuleState[] measuredModuleStates = {
         new SwerveModuleState(),
@@ -81,6 +83,8 @@ public class SwerveDrive extends SubsystemBase{
                     new ModuleIOSim()
                 };
                 gyroIO = new GyroIO() {};
+
+                
                 break;
             default:
                 modules = new ModuleIO[] {
@@ -182,6 +186,7 @@ public class SwerveDrive extends SubsystemBase{
             m_poseEstimator.getEstimatedPosition().getRotation().getRadians()
         });
 
+        desiredRobotRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(desiredFeildRelativeSpeeds, yaw);
         Logger.recordOutput("SwerveDrive/desiredRobotRelativeSpeeds", desiredRobotRelativeSpeeds);
         Logger.recordOutput("SwerveDrive/measuredRobotRelativeSpeeds", measuredRobotRelativeSpeeds);
         Logger.recordOutput("SwerveDrive/desiredFeildRelativeSpeeds", desiredFeildRelativeSpeeds);
@@ -189,9 +194,10 @@ public class SwerveDrive extends SubsystemBase{
 
 
         ChassisSpeeds correctedSpeeds = desiredRobotRelativeSpeeds;
-        correctedSpeeds.omegaRadiansPerSecond = 
-            m_angleFeedForwardController.calculate(desiredRobotRelativeSpeeds.omegaRadiansPerSecond, Math.signum(desiredRobotRelativeSpeeds.omegaRadiansPerSecond - measuredRobotRelativeSpeeds.omegaRadiansPerSecond)) + 
-            m_angleFeedbackController.calculate(measuredRobotRelativeSpeeds.omegaRadiansPerSecond, desiredRobotRelativeSpeeds.omegaRadiansPerSecond);
+        // correctedSpeeds.omegaRadiansPerSecond = 
+        //     m_angleFeedForwardController.calculate(desiredRobotRelativeSpeeds.omegaRadiansPerSecond, Math.signum(desiredRobotRelativeSpeeds.omegaRadiansPerSecond - measuredRobotRelativeSpeeds.omegaRadiansPerSecond)) + 
+        //     m_angleFeedbackController.calculate(measuredRobotRelativeSpeeds.omegaRadiansPerSecond, desiredRobotRelativeSpeeds.omegaRadiansPerSecond);
+
 
         Logger.recordOutput("SwerveDrive/correctedSpeeds", correctedSpeeds);
 
@@ -206,7 +212,6 @@ public class SwerveDrive extends SubsystemBase{
 
     public void driveFieldRelative(ChassisSpeeds speeds) {
         desiredFeildRelativeSpeeds = speeds;
-        desiredRobotRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, yaw);
     }
 
     public void driveRobotRelatve(ChassisSpeeds speeds) {
