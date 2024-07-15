@@ -60,7 +60,7 @@ public class SwerveDrive extends SubsystemBase{
     private ChassisSpeeds measuredFeildRelativeSpeeds = new ChassisSpeeds(0,0,0);
 
     private PIDController m_angleFeedbackController;
-    private DriveFFController driveFFController;
+    private DriveFFController driveFFController = new DriveFFController();
 
     private PIDController m_translationalFeedbackController;
 
@@ -198,6 +198,7 @@ public class SwerveDrive extends SubsystemBase{
         //     m_angleFeedForwardController.calculate(desiredRobotRelativeSpeeds.omegaRadiansPerSecond, Math.signum(desiredRobotRelativeSpeeds.omegaRadiansPerSecond - measuredRobotRelativeSpeeds.omegaRadiansPerSecond)) + 
         //     m_angleFeedbackController.calculate(measuredRobotRelativeSpeeds.omegaRadiansPerSecond, desiredRobotRelativeSpeeds.omegaRadiansPerSecond);
 
+        Logger.recordOutput("SwerveDrive/estimatedVyDriftvxMetersPerSecond", driveFFController.calculate(desiredFeildRelativeSpeeds.vxMetersPerSecond, desiredFeildRelativeSpeeds.omegaRadiansPerSecond));
 
         Logger.recordOutput("SwerveDrive/correctedSpeeds", correctedSpeeds);
 
