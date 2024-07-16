@@ -10,8 +10,8 @@
       "style": "0",
       "userScale": "2",
       "width": "1280",
-      "xpos": "141",
-      "ypos": "594"
+      "xpos": "72",
+      "ypos": "571"
     }
   },
   "Window": {
@@ -56,7 +56,7 @@
       "Size": "400,400"
     },
     "Robot State": {
-      "Collapsed": "0",
+      "Collapsed": "1",
       "Pos": "4,20",
       "Size": "92,116"
     }

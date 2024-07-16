@@ -59,10 +59,10 @@ public class SwerveDrive extends SubsystemBase{
     private ChassisSpeeds measuredRobotRelativeSpeeds = new ChassisSpeeds(0,0,0);
     private ChassisSpeeds measuredFeildRelativeSpeeds = new ChassisSpeeds(0,0,0);
 
-    private PIDController m_angleFeedbackController;
+    private PIDController m_angleFeedbackController = new PIDController(1, 0, 0);;
     private DriveFFController driveFFController = new DriveFFController();
 
-    private PIDController m_translationalFeedbackController;
+    private PIDController m_translationalFeedbackController = new PIDController(1, 0, 0);
 
     private SwerveModuleState[] measuredModuleStates = {
         new SwerveModuleState(),
@@ -193,12 +193,21 @@ public class SwerveDrive extends SubsystemBase{
         Logger.recordOutput("SwerveDrive/measuredFeildRelativeSpeeds", measuredFeildRelativeSpeeds);
 
 
-        ChassisSpeeds correctedSpeeds = desiredRobotRelativeSpeeds;
-        // correctedSpeeds.omegaRadiansPerSecond = 
-        //     m_angleFeedForwardController.calculate(desiredRobotRelativeSpeeds.omegaRadiansPerSecond, Math.signum(desiredRobotRelativeSpeeds.omegaRadiansPerSecond - measuredRobotRelativeSpeeds.omegaRadiansPerSecond)) + 
-        //     m_angleFeedbackController.calculate(measuredRobotRelativeSpeeds.omegaRadiansPerSecond, desiredRobotRelativeSpeeds.omegaRadiansPerSecond);
+        
+        double estimatedVyDriftMetersPerSecond = driveFFController.calculate(desiredFeildRelativeSpeeds.vxMetersPerSecond, desiredFeildRelativeSpeeds.omegaRadiansPerSecond);
+        double estimatedVxDriftMetersPerSecond = driveFFController.calculate(desiredFeildRelativeSpeeds.vyMetersPerSecond, desiredFeildRelativeSpeeds.omegaRadiansPerSecond);
+        Logger.recordOutput("SwerveDrive/estimatedVxDriftMetersPerSecond", estimatedVxDriftMetersPerSecond);
+        Logger.recordOutput("SwerveDrive/estimatedVyDriftMetersPerSecond", estimatedVyDriftMetersPerSecond);
 
-        Logger.recordOutput("SwerveDrive/estimatedVyDriftvxMetersPerSecond", driveFFController.calculate(desiredFeildRelativeSpeeds.vxMetersPerSecond, desiredFeildRelativeSpeeds.omegaRadiansPerSecond));
+        ChassisSpeeds correctedSpeeds = desiredFeildRelativeSpeeds;
+        correctedSpeeds.vxMetersPerSecond = correctedSpeeds.vxMetersPerSecond + estimatedVxDriftMetersPerSecond + 
+                                            m_translationalFeedbackController.calculate(measuredFeildRelativeSpeeds.vxMetersPerSecond, 
+                                            desiredFeildRelativeSpeeds.vxMetersPerSecond);
+        correctedSpeeds.vyMetersPerSecond = correctedSpeeds.vyMetersPerSecond - estimatedVyDriftMetersPerSecond + 
+                                            m_translationalFeedbackController.calculate(measuredFeildRelativeSpeeds.vyMetersPerSecond, 
+                                            desiredFeildRelativeSpeeds.vyMetersPerSecond);
+        correctedSpeeds.omegaRadiansPerSecond = correctedSpeeds.omegaRadiansPerSecond + m_angleFeedbackController.calculate(measuredFeildRelativeSpeeds.omegaRadiansPerSecond, desiredFeildRelativeSpeeds.omegaRadiansPerSecond);
+        correctedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(correctedSpeeds, yaw);
 
         Logger.recordOutput("SwerveDrive/correctedSpeeds", correctedSpeeds);
 

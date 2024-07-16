@@ -2,7 +2,10 @@ package frc.robot.subsystems.drivetrain.swerve;
 
 import java.util.ArrayList;
 
+import org.littletonrobotics.junction.Logger;
+
 import frc.robot.Constants;
+import frc.robot.lib.util.RebelUtil;
 
 public class DriveFFController {
     ArrayList<double[]> points = new ArrayList<double[]>();
@@ -15,10 +18,10 @@ public class DriveFFController {
                 points.add(new double[] {4, 0, 0});
                 points.add(new double[] {0, Math.PI, 0});
                 points.add(new double[] {0, 2 * Math.PI, 0});
-                points.add(new double[] {4, 2 * Math.PI, 0.121});
+                points.add(new double[] {4, 2 * Math.PI, 1.237});
                 points.add(new double[] {2, 2 * Math.PI, 0.582});
                 points.add(new double[] {4, Math.PI, 0.435});
-                points.add(new double[] {2, Math.PI, .412});
+                points.add(new double[] {2, Math.PI, 0.412});
                 break;
 
             default:
@@ -35,13 +38,14 @@ public class DriveFFController {
         }
     }
     public double calculate(double imps, double irps) {
-        double mps = Math.abs(imps);
-        double rps = Math.abs(irps);
-        for (int i = 0; i < points.size(); i++) {
-            if (points.get(i)[0] == mps && points.get(i)[1] == rps) {
-                return points.get(i)[2];
-            }
-        }
+
+        double mps = RebelUtil.constrain(Math.abs(imps), 0, 4);
+        double rps = RebelUtil.constrain(Math.abs(irps), 0, 2 * Math.PI);
+        // for (int i = 0; i < points.size(); i++) {
+        //     if (points.get(i)[0] == mps && points.get(i)[1] == rps) {
+        //         return points.get(i)[2];
+        //     }
+        // }
 
         double[] inputPoint = new double[] {mps, rps, 0};
 
@@ -105,27 +109,38 @@ public class DriveFFController {
             }
         }
          
-        double r1 = (tr[0] - inputPoint[0])/(tr[0] - tl[0]) * tl[2] + (inputPoint[0] - tl[0])/(tr[0] - tl[0]) * tr[2];
-        double r2 = (br[0] - inputPoint[0])/(br[0] - bl[0]) * bl[2] + (inputPoint[0] - bl[0])/(br[0] - bl[0]) * br[2];
-        double pf = (inputPoint[1] - br[1])/(tr[1] - br[1]) * r1 + (tr[1] - inputPoint[1])/(tr[1] - bl[1]) * r2;
+        double r1 = Math.abs((tr[0] - inputPoint[0])/(tr[0] - tl[0]) * tl[2] + (inputPoint[0] - tl[0])/(tr[0] - tl[0]) * tr[2]);
+        double r2 = Math.abs((br[0] - inputPoint[0])/(br[0] - bl[0]) * bl[2] + (inputPoint[0] - bl[0])/(br[0] - bl[0]) * br[2]);
+        double pf = Math.abs((inputPoint[1] - br[1])/(tr[1] - br[1]) * r1 + (tr[1] - inputPoint[1])/(tr[1] - bl[1]) * r2);
 
-        int multiplier = 1;
-        if (mps >= 0 && rps <= 0) {
-            multiplier = -multiplier;
-        }
-        
-        else if (mps <= 0 && rps >= 0) {
-            multiplier = -multiplier;
+        Logger.recordOutput("SwerveDrive/driveFF/r1", r1);
+        Logger.recordOutput("SwerveDrive/driveFF/r2", r2);
+        Logger.recordOutput("SwerveDrive/driveFF/pf", pf);
+
+
+        double multiplier = 1;
+        if (imps >= 0 && irps <= 0) {
+            multiplier = -1;
+        }        
+        else if (imps <= 0 && irps >= 0) {
+            multiplier = -1;
         }
 
-        if (r1 == 0) {
-            return r2 * multiplier;
-        }
-        if (r2 == 0) {
-            return r1 * multiplier;
-        }
-        return pf * multiplier;
+        Logger.recordOutput("SwerveDrive/driveFF/multiplier", multiplier);
 
+        if (!Double.isNaN(pf) && Double.isFinite(pf)) {
+            return (pf * multiplier);
+        }
+
+        if (r1 == 0 && !Double.isNaN(r2) && Double.isFinite(r2)) {
+            return (r2 * multiplier);
+        }
+
+        if (r2 == 0 && !Double.isNaN(r1) && Double.isFinite(r1)) {
+            return (r1 * multiplier);
+        }
+
+        return 0;
         
 
     }
@@ -136,7 +151,7 @@ public class DriveFFController {
 
     public static void main(String[] args) {
         DriveFFController driveFFController = new DriveFFController();
-        System.out.println(driveFFController.calculate(1, -1));
+        System.out.println(driveFFController.calculate(-1, -1));
     }
     
 }
