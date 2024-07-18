@@ -113,7 +113,7 @@ public class ModuleIOTalon implements ModuleIO {
     }
 
     @Override
-    public void setState(SwerveModuleState state, double nextAngle) {
+    public void setState(SwerveModuleState state) {
         double speed = state.speedMetersPerSecond;
         m_driveVoltage = m_driveFeedforward.calculate(speed, Math.signum(speed - driveVelocityMps)) + 
                          m_driveFeedbackController.calculate(driveVelocityMps, speed);

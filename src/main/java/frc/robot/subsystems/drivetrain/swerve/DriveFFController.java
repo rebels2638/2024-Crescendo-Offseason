@@ -30,7 +30,7 @@ public class DriveFFController {
                 points.add(new double[] {2, 0, 0});
                 points.add(new double[] {0, Math.PI, 0});
                 points.add(new double[] {0, 2 * Math.PI, 0});
-                points.add(new double[] {2, 2 * Math.PI, 0.45});
+                points.add(new double[] {2, 2 * Math.PI, 0.8});
                 points.add(new double[] {1, 2 * Math.PI, 0.212});
                 points.add(new double[] {2, Math.PI, 0.344});
                 points.add(new double[] {1, Math.PI, 0.25});
@@ -58,25 +58,35 @@ public class DriveFFController {
         temp.addAll(points);
 
         for (int n = 0; n < 4; n++) {
-            int index = 0;
-            for(int i = 0; i < temp.size(); i++) {
-                if (distance(temp.get(i), inputPoint) < Math.sqrt(2) + 0.1) {
-                    boolean good = true;
-                    for (int m = 0; m < n; m++) {
-                        if (distance(p[m], temp.get(i)) > Math.sqrt(2) + 0.1) {
-                            good = false;
-                            break;
-                        }
-                    }
-                    if (good) {
-                        p[n] = temp.get(i);
+            
+            boolean good = false;
+            
+            while (!good) {
+                int index = 0;
+                double minDist = Integer.MAX_VALUE;
+                good = true;
+                for(int i = 0; i < temp.size(); i++) {
+                    if (distance(temp.get(i), inputPoint) < minDist) {
+                        minDist = distance(temp.get(i), inputPoint);
                         index = i;
+                    }
+                }
+
+                for (int m = 0; m < n; m++) {
+                    if (distance(p[m], temp.get(index)) > Math.sqrt(2)) {
+                        good = false;
                         break;
                     }
                 }
+                if (good) {
+                    p[n] = temp.get(index);
+                }       
+
+                temp.remove(index); 
             }
-            temp.remove(index);
         }
+            
+    
         
         double[] tr, tl, br, bl;
         tr = new double[] {-Integer.MAX_VALUE, -Integer.MAX_VALUE, 0};
@@ -141,17 +151,27 @@ public class DriveFFController {
         }
 
         return 0;
-        
 
     }
 
     private double distance(double[] a, double[] b) {
-        return Math.sqrt(Math.pow((a[0] - b[0]) / 2, 2) + Math.pow((a[1] - b[1]) / Math.PI, 2));
+        double r;
+        switch (Constants.currentMode) {
+            case SIM:
+                r = Math.sqrt(Math.pow((a[0] - b[0]) / 2, 2) + Math.pow((a[1] - b[1]) / Math.PI, 2));
+                break;
+
+            default:
+                r = Math.sqrt(Math.pow((a[0] - b[0]), 2) + Math.pow((a[1] - b[1]) / Math.PI, 2));
+                break;
+        }
+
+        return r;
     }
 
     public static void main(String[] args) {
         DriveFFController driveFFController = new DriveFFController();
-        System.out.println(driveFFController.calculate(-1, -1));
+        System.out.println(driveFFController.calculate(-1, -3.23));
     }
     
 }

@@ -54,7 +54,7 @@ public class AutoRunner {
                 swerveSubsystem::getPose, // Robot pose supplier
                 swerveSubsystem::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
                 swerveSubsystem::getMeasuredRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                swerveSubsystem::driveRobotRelatve, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+                swerveSubsystem::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
                 new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
                         Constants.Auton.TRANSLATION_PID_CONFIG, // Translation PID constants
                         Constants.Auton.ANGLE_PID_CONFIG, // Rotation PID constants

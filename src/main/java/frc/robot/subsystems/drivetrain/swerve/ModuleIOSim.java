@@ -66,7 +66,7 @@ public class ModuleIOSim implements ModuleIO {
     }
 
     @Override
-    public void setState(SwerveModuleState state, double nextAngle) {
+    public void setState(SwerveModuleState state) {
         double speed = state.speedMetersPerSecond;
         m_driveVoltage = m_driveFeedforward.calculate(speed, Math.signum(speed - m_driveSim.getAngularVelocityRPM())) + 
                          m_driveFeedbackController.calculate(m_driveSim.getAngularVelocityRPM(), speed);
