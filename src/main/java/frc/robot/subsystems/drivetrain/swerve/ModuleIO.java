@@ -13,6 +13,8 @@ public interface ModuleIO {
         public double angleVelocityRadPerSec = 0;
         public double anglePositionRad = 0;
 
+        public double absEncoderRad = 0;
+
         public double driveCurrentAmps = 0;
         public double angleCurrentAmps = 0;
 
