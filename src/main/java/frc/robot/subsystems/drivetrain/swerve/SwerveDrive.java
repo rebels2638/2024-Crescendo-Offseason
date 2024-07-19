@@ -1,8 +1,5 @@
 package frc.robot.subsystems.drivetrain.swerve;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -16,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -25,7 +23,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class SwerveDrive extends SubsystemBase{
+public class SwerveDrive extends SubsystemBase {
 
     private SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
         Constants.DrivetrainConstants.kFRONT_LEFT_POSITION_METERS,
@@ -65,6 +63,13 @@ public class SwerveDrive extends SubsystemBase{
     private PIDController m_translationalFeedbackController = new PIDController(1, 0, 0);
 
     private SwerveModuleState[] measuredModuleStates = {
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState()
+    };
+
+    private SwerveModuleState[] previousDesiredStates = {
         new SwerveModuleState(),
         new SwerveModuleState(),
         new SwerveModuleState(),
@@ -212,9 +217,19 @@ public class SwerveDrive extends SubsystemBase{
         Logger.recordOutput("SwerveDrive/correctedSpeeds", correctedSpeeds);
 
         SwerveModuleState[] desiredModuleStates = m_kinematics.toSwerveModuleStates(correctedSpeeds);
+        if (Math.abs(desiredRobotRelativeSpeeds.vxMetersPerSecond) <= 0.01 && 
+            Math.abs(desiredRobotRelativeSpeeds.vyMetersPerSecond) <= 0.01 && 
+            Math.abs(desiredRobotRelativeSpeeds.omegaRadiansPerSecond) <= 0.1) {
+            desiredModuleStates = measuredModuleStates;
+            for (int i = 0; i < 4; i++) {
+                desiredModuleStates[i].speedMetersPerSecond = 0;
+            }
+        }
         for (int i = 0; i < 4; i++) {
+            Logger.recordOutput("SwerveDrive/unoptimizedDesiredModuleStates", desiredModuleStates);
+
             desiredModuleStates[i] = SwerveModuleState.optimize(desiredModuleStates[i], measuredModuleStates[i].angle);
-            modules[i].setState(desiredModuleStates[i], 0);
+            modules[i].setState(desiredModuleStates[i]);
         }
 
         Logger.recordOutput("SwerveDrive/desiredModuleStates", desiredModuleStates);
@@ -224,7 +239,7 @@ public class SwerveDrive extends SubsystemBase{
         desiredFeildRelativeSpeeds = speeds;
     }
 
-    public void driveRobotRelatve(ChassisSpeeds speeds) {
+    public void driveRobotRelative(ChassisSpeeds speeds) {
         desiredRobotRelativeSpeeds = speeds;
     }
 
@@ -239,6 +254,10 @@ public class SwerveDrive extends SubsystemBase{
         gyroIO.reset(new Rotation3d(0,0, pose.getRotation().getRadians()));
         m_poseEstimator.resetPosition(pose.getRotation(), positions, pose);
         odometryLock.unlock();
+    }
+
+    public void zeroGyro() {
+        gyroIO.zero();
     }
 
     public ChassisSpeeds getMeasuredRobotRelativeSpeeds() {
