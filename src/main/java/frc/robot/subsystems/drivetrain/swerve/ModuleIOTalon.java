@@ -13,6 +13,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 import frc.robot.lib.util.RebelUtil;
 
@@ -137,6 +138,8 @@ public class ModuleIOTalon implements ModuleIO {
 
     @Override
     public void setState(SwerveModuleState state) {
+        if (DriverStation.isTest()) {return;}
+
         double speed = state.speedMetersPerSecond;
         m_driveVoltage = m_driveFeedbackController.calculate(driveVelocityMps, speed);
         m_driveVoltage += m_driveFeedforward.calculate(speed, Math.signum(m_driveVoltage));
@@ -155,7 +158,7 @@ public class ModuleIOTalon implements ModuleIO {
         double angle = state.angle.getRadians();
 
         m_angleVoltage = m_angleFeedbackController.calculate(anglePositionRad, angle);
-        m_angleVoltage += m_angleFeedforward.calculate(angle - anglePositionRad, Math.signum(m_angleVoltage));
+        m_angleVoltage += m_angleFeedforward.calculate(angle - anglePositionRad, Math.signum(m_angleVoltage)); // TODO: this is scuffed
                          
 
         m_angleVoltage = RebelUtil.constrain(

@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.AutoRunner;
 import frc.robot.commands.drivetrain.AbsoluteFieldDrive;
 import frc.robot.commands.shooter.ShooterStop;
@@ -41,6 +42,11 @@ public class RobotContainer {
 
     xboxOperator.getAButton().whileTrue(new ShooterWindup(flywheelSubsystem));
     xboxOperator.getAButton().whileFalse(new ShooterStop(flywheelSubsystem));
+
+    xboxTester.getAButton().whileTrue(swerveDrive.sysIDriveQuasistatic(Direction.kForward));
+    xboxTester.getBButton().whileTrue(swerveDrive.sysIDriveQuasistatic(Direction.kReverse));
+    xboxTester.getXButton().whileTrue(swerveDrive.sysIdDriveDynamic(Direction.kForward));
+    xboxTester.getYButton().whileTrue(swerveDrive.sysIdDriveDynamic(Direction.kReverse));
 
   }
 

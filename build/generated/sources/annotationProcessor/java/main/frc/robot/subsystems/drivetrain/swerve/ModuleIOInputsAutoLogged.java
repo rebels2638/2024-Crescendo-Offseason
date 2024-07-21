@@ -12,6 +12,7 @@ public class ModuleIOInputsAutoLogged extends ModuleIO.ModuleIOInputs implements
     table.put("DrivePositionMeters", drivePositionMeters);
     table.put("AngleVelocityRadPerSec", angleVelocityRadPerSec);
     table.put("AnglePositionRad", anglePositionRad);
+    table.put("AbsEncoderRad", absEncoderRad);
     table.put("DriveCurrentAmps", driveCurrentAmps);
     table.put("AngleCurrentAmps", angleCurrentAmps);
     table.put("DriveTempC", driveTempC);
@@ -26,6 +27,7 @@ public class ModuleIOInputsAutoLogged extends ModuleIO.ModuleIOInputs implements
     drivePositionMeters = table.get("DrivePositionMeters", drivePositionMeters);
     angleVelocityRadPerSec = table.get("AngleVelocityRadPerSec", angleVelocityRadPerSec);
     anglePositionRad = table.get("AnglePositionRad", anglePositionRad);
+    absEncoderRad = table.get("AbsEncoderRad", absEncoderRad);
     driveCurrentAmps = table.get("DriveCurrentAmps", driveCurrentAmps);
     angleCurrentAmps = table.get("AngleCurrentAmps", angleCurrentAmps);
     driveTempC = table.get("DriveTempC", driveTempC);
@@ -40,6 +42,7 @@ public class ModuleIOInputsAutoLogged extends ModuleIO.ModuleIOInputs implements
     copy.drivePositionMeters = this.drivePositionMeters;
     copy.angleVelocityRadPerSec = this.angleVelocityRadPerSec;
     copy.anglePositionRad = this.anglePositionRad;
+    copy.absEncoderRad = this.absEncoderRad;
     copy.driveCurrentAmps = this.driveCurrentAmps;
     copy.angleCurrentAmps = this.angleCurrentAmps;
     copy.driveTempC = this.driveTempC;

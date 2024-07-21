@@ -2,6 +2,7 @@ package frc.robot.subsystems.drivetrain.swerve;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -13,14 +14,24 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import frc.robot.Constants;
 
 public class SwerveDrive extends SubsystemBase {
@@ -77,6 +88,9 @@ public class SwerveDrive extends SubsystemBase {
     };
 
     private double prevTime = Timer.getFPGATimestamp();
+
+    private final Config m_sysDriveConfig;
+    private final SysIdRoutine m_sysDriveIdRoutine;
     
     public SwerveDrive() {
         switch (Constants.currentMode) {
@@ -89,6 +103,7 @@ public class SwerveDrive extends SubsystemBase {
                 };
                 gyroIO = new GyroIO() {};
 
+                m_sysDriveConfig = new Config(Units.Volts.per(Units.Second).of(1), Units.Volts.of(7), Units.Second.of(10));
                 
                 break;
             default:
@@ -99,8 +114,25 @@ public class SwerveDrive extends SubsystemBase {
                     new ModuleIOTalon(3)
                 };
                 gyroIO = new GyroIONavX();
+
+                m_sysDriveConfig = new Config(Units.Volts.per(Units.Second).of(1), Units.Volts.of(7), Units.Second.of(10));
+
                 break;
         }
+
+        Consumer<Measure<Voltage>> driveConsumer = volts -> {
+            for (int i = 0; i < 4; i++) {
+                modules[i].setDriveVoltage(volts.baseUnitMagnitude());
+            }};
+        Consumer<SysIdRoutineLog> logConsumer = log -> {
+            for (int i = 0; i < 4; i++) {
+                log.motor("module" + i).
+                    voltage(Units.Volts.of(moduleInputs[i].driveVoltage)).
+                    linearVelocity(Units.MetersPerSecond.of(moduleInputs[i].driveVelocityMps)).
+                    linearPosition(Units.Meters.of(moduleInputs[i].drivePositionMeters));
+            }};
+        Mechanism m_driveMechanism = new Mechanism(driveConsumer, logConsumer, this);
+        m_sysDriveIdRoutine = new SysIdRoutine(m_sysDriveConfig, m_driveMechanism);
 
         m_poseEstimator = new SwerveDrivePoseEstimator(
             m_kinematics,
@@ -115,6 +147,7 @@ public class SwerveDrive extends SubsystemBase {
 
         odometryThread = new Notifier(this::updateOdometry);
         odometryThread.startPeriodic(0.02);
+
     }
 
     private void updateInputs() {
@@ -144,9 +177,9 @@ public class SwerveDrive extends SubsystemBase {
 
             yaw = new Rotation2d(yaw.getRadians() % (2 * Math.PI));
 
-        prevTime = Timer.getFPGATimestamp();
         }
 
+        prevTime = Timer.getFPGATimestamp();
     }
 
     @Override 
@@ -217,14 +250,14 @@ public class SwerveDrive extends SubsystemBase {
         Logger.recordOutput("SwerveDrive/correctedSpeeds", correctedSpeeds);
 
         SwerveModuleState[] desiredModuleStates = m_kinematics.toSwerveModuleStates(correctedSpeeds);
-        if (Math.abs(desiredRobotRelativeSpeeds.vxMetersPerSecond) <= 0.01 && 
-            Math.abs(desiredRobotRelativeSpeeds.vyMetersPerSecond) <= 0.01 && 
-            Math.abs(desiredRobotRelativeSpeeds.omegaRadiansPerSecond) <= 0.1) {
-            desiredModuleStates = measuredModuleStates;
-            for (int i = 0; i < 4; i++) {
-                desiredModuleStates[i].speedMetersPerSecond = 0;
-            }
-        }
+        // if (Math.abs(desiredRobotRelativeSpeeds.vxMetersPerSecond) <= 0.01 && 
+        //     Math.abs(desiredRobotRelativeSpeeds.vyMetersPerSecond) <= 0.01 && 
+        //     Math.abs(desiredRobotRelativeSpeeds.omegaRadiansPerSecond) <= 0.1) {
+        //     desiredModuleStates = measuredModuleStates;
+        //     for (int i = 0; i < 4; i++) {
+        //         desiredModuleStates[i].speedMetersPerSecond = 0;
+        //     }
+        // } 
         for (int i = 0; i < 4; i++) {
             Logger.recordOutput("SwerveDrive/unoptimizedDesiredModuleStates", desiredModuleStates);
 
@@ -315,5 +348,13 @@ public class SwerveDrive extends SubsystemBase {
         m_poseEstimator.resetPosition(gyroInputs.yaw, getSwerveModulePositions(), getPose());
         odometryLock.unlock();
         m_kinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0, gyroInputs.yaw)); // TODO: this is yaw in radians right?
+    }
+
+    public Command sysIDriveQuasistatic(SysIdRoutine.Direction direction) {
+        return m_sysDriveIdRoutine.quasistatic(direction);
+    }
+
+    public Command sysIdDriveDynamic(SysIdRoutine.Direction direction) {
+        return m_sysDriveIdRoutine.dynamic(direction);
     }
 }

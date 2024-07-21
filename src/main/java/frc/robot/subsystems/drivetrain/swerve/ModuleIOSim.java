@@ -4,6 +4,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants;
@@ -67,6 +68,8 @@ public class ModuleIOSim implements ModuleIO {
 
     @Override
     public void setState(SwerveModuleState state) {
+        if (DriverStation.isTest()) {return;}
+
         double speed = state.speedMetersPerSecond;
         m_driveVoltage = m_driveFeedforward.calculate(speed, Math.signum(speed - m_driveSim.getAngularVelocityRPM())) + 
                          m_driveFeedbackController.calculate(m_driveSim.getAngularVelocityRPM(), speed);
@@ -78,7 +81,7 @@ public class ModuleIOSim implements ModuleIO {
         m_driveSim.setInputVoltage(m_driveVoltage);
 
         double angle = state.angle.getRadians();
-        m_angleVoltage = m_angleFeedforward.calculate(0, Math.signum(angle - anglePositionRad)) + 
+        m_angleVoltage = m_angleFeedforward.calculate(0, 0) + 
                          m_angleFeedbackController.calculate(anglePositionRad, angle);
 
         m_angleVoltage = RebelUtil.constrain(
@@ -86,6 +89,15 @@ public class ModuleIOSim implements ModuleIO {
                          Constants.DrivetrainConstants.kMAX_ANGLE_VOLTAGE);
 
         m_angleSim.setInputVoltage(m_angleVoltage);
+    }
+
+    @Override
+    public void setDriveVoltage(double voltage) {
+        m_driveVoltage = RebelUtil.constrain(
+                         voltage, -Constants.DrivetrainConstants.kMAX_DRIVE_VOLTAGE,
+                         Constants.DrivetrainConstants.kMAX_DRIVE_VOLTAGE);
+                         
+        m_driveSim.setInputVoltage(m_driveVoltage);
     }
 
     @Override

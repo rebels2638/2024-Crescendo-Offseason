@@ -20,7 +20,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  */
 public final class Constants {
   public static final Mode currentMode = Mode.SIM; // TODO: change this if sim
-
+  // public static final boolean isSYSID = true; // TODO: change this if sysid
   public static enum Mode {
     /** Running on a real robot. */
     REAL,
@@ -31,7 +31,7 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY_REAL,
 
-    REPLAY_SIM
+    REPLAY_SIM,
   }
   
   public static class OperatorConstants {
