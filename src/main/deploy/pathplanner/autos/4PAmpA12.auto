@@ -90,7 +90,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "FromFar1ToAmp"
+                        "pathName": null
                       }
                     }
                   ]
@@ -116,7 +116,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "FromFar2ToAmp"
+                        "pathName": null
                       }
                     },
                     {
@@ -152,6 +152,6 @@
       ]
     }
   },
-  "folder": "3P",
+  "folder": null,
   "choreoAuto": false
 }

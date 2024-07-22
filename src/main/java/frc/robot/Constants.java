@@ -8,7 +8,10 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -50,9 +53,9 @@ public final class Constants {
   {
 
     public static final PIDConstants TRANSLATION_PID_CONFIG = new PIDConstants(0, 0, 0.0000);
-    public static final PIDConstants ANGLE_PID_CONFIG = new PIDConstants(0, 0, 0.00008); 
+    public static final PIDConstants ANGLE_PID_CONFIG = new PIDConstants(0, 0, 0.0); 
 
-    public static final double MAX_SPEED = 4;
+    public static final double MAX_SPEED = 4.5;
     public static final double MAX_ACCELERATION = 2;
     public static final double MAX_ANGULAR_VELO_RPS = 2; // 1
     public static final double MAX_ANGULAR_ACCEL_RPS_SQUARED = 1; // 0.5
@@ -93,7 +96,18 @@ public final class Constants {
 
     public static final double kMAX_ANGLE_VOLTAGE = 12;
     public static final double kMAX_DRIVE_VOLTAGE = 12;
-
-
   }
+
+  public static class FieldConstants {
+    public static final Translation3d kNOTE_3_TRANS = new Translation3d(8.23, 4.1, 0);
+  }
+
+  public static class VisionConstants {
+    public static final Pose3d kNOTE_DETECTOR_CAMERA_POSE = 
+      new Pose3d(new Translation3d(.38, 0, .2), new Rotation3d(Math.toRadians(0), Math.toRadians(23), Math.toRadians(0)));
+    public static final double kNOTE_DETECTOR_CAMERA_FOV_X_RAD = Math.toRadians(80);
+    public static final double kNOTE_DETECTOR_CAMERA_FOV_Y_RAD = Math.toRadians(56);
+    public static final double kNOTE_DETECTOR_CAMERA_MAX_RANGE_METERS = 2;
+  }
+
 }

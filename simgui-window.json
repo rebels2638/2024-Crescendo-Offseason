@@ -10,8 +10,8 @@
       "style": "0",
       "userScale": "2",
       "width": "1280",
-      "xpos": "72",
-      "ypos": "571"
+      "xpos": "126",
+      "ypos": "626"
     }
   },
   "Window": {
@@ -37,7 +37,7 @@
     },
     "###Other Devices": {
       "Collapsed": "0",
-      "Pos": "1023,20",
+      "Pos": "1024,19",
       "Size": "250,630"
     },
     "###System Joysticks": {
@@ -56,7 +56,7 @@
       "Size": "400,400"
     },
     "Robot State": {
-      "Collapsed": "1",
+      "Collapsed": "0",
       "Pos": "4,20",
       "Size": "92,116"
     }

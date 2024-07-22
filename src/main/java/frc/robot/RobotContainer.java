@@ -9,6 +9,7 @@ import frc.robot.commands.shooter.ShooterStop;
 import frc.robot.commands.shooter.ShooterWindup;
 import frc.robot.lib.input.XboxController;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
+import frc.robot.subsystems.drivetrain.vision.NoteDetector;
 import frc.robot.subsystems.shooter.pivot.flywheel.Flywheel;
 
 public class RobotContainer {
@@ -18,11 +19,13 @@ public class RobotContainer {
   private final XboxController xboxDriver;
   private final XboxController xboxOperator;
 
-  private Flywheel flywheelSubsystem;
+  private final Flywheel flywheelSubsystem;
 
-  private SwerveDrive swerveDrive;
+  private final SwerveDrive swerveDrive;
 
-  private AutoRunner autoRunner;
+  private final AutoRunner autoRunner;
+
+  private final NoteDetector noteDetector;
 
   public RobotContainer() {
     this.xboxTester = new XboxController(1);
@@ -32,6 +35,7 @@ public class RobotContainer {
     
     swerveDrive = new SwerveDrive();
     flywheelSubsystem = new Flywheel();
+    noteDetector = new NoteDetector(swerveDrive);
 
     autoRunner = new AutoRunner(swerveDrive);
     

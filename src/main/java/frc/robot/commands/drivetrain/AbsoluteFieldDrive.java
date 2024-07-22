@@ -1,13 +1,9 @@
 package frc.robot.commands.drivetrain;
 
 
-import java.util.List;
 import java.util.function.DoubleSupplier;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
@@ -48,6 +44,6 @@ public class AbsoluteFieldDrive extends Command {
   @Override
   public boolean isFinished()
   {
-    return true;
+    return false;
   }
 }
