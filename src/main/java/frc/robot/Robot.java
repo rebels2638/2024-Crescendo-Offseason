@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
@@ -52,7 +51,7 @@ public class Robot extends LoggedRobot {
     // Replaying a log, set up replay source
     default:
       setUseTiming(false);
-      String logPath = LogFileUtil.findReplayLog();
+      // String logPath = LogFileUtil.findReplayLog();
       // Logger.setReplaySource(new WPILOGReader(logPath));
       // // Logger.addDataReceiver(new NT4Publisher());
       // Logger.addDataReceiver(new WPILOGWriter(logPath));

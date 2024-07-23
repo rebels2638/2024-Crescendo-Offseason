@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
+import frc.robot.subsystems.drivetrain.vision.NoteDetectorIOInputsAutoLogged;
 
 public class NoteDetector extends SubsystemBase {
     private final NoteDetectorIOInputsAutoLogged inputs = new NoteDetectorIOInputsAutoLogged();

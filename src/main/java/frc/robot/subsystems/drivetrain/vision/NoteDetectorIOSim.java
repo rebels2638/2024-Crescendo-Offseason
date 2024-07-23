@@ -35,17 +35,25 @@ public class NoteDetectorIOSim implements NoteDetectorIO {
         
         Logger.recordOutput("NoteDetector/cameraPose", cameraPose);
 
-        double vxAngle = (Math.atan2(Constants.FieldConstants.kNOTE_3_TRANS.getY() - cameraPose.getY(), 
-                                    Constants.FieldConstants.kNOTE_3_TRANS.getX() - cameraPose.getX()) - 
+        Translation3d closestNote = new Translation3d();
+        double minDist = Double.MAX_VALUE;
+        for (int i = 0; i < Constants.FieldConstants.kNOTE_ARR.length; i++) {
+            double dist = cameraPose.getTranslation().getDistance(Constants.FieldConstants.kNOTE_ARR[i]);
+            if (dist < minDist) {
+                minDist = dist;
+                closestNote = Constants.FieldConstants.kNOTE_ARR[i];
+            }
+        }
+        double vxAngle = (Math.atan2(closestNote.getY() - cameraPose.getY(), 
+                                    closestNote.getX() - cameraPose.getX()) - 
                                     cameraPose.getRotation().getZ()) % (Math.PI * 2);
 
-        double x = Math.sqrt(Math.pow(Constants.FieldConstants.kNOTE_3_TRANS.getY() - cameraPose.getY(), 2) +
-                                Math.pow(Constants.FieldConstants.kNOTE_3_TRANS.getX() - cameraPose.getX(), 2));
+        double x = Math.sqrt(Math.pow(closestNote.getY() - cameraPose.getY(), 2) +
+                                Math.pow(closestNote.getX() - cameraPose.getX(), 2));
 
-        double vyAngle = (Math.atan2(Constants.FieldConstants.kNOTE_3_TRANS.getZ() - cameraPose.getZ(), x) + 
+        double vyAngle = (Math.atan2(closestNote.getZ() - cameraPose.getZ(), x) + 
                         cameraPose.getRotation().getY()) % (Math.PI * 2);
         
-        double dist = cameraPose.getTranslation().getDistance(Constants.FieldConstants.kNOTE_3_TRANS);
 
         Logger.recordOutput("NoteDetector/vxAngle", vxAngle);
         Logger.recordOutput("NoteDetector/vyAngle", vyAngle);
@@ -53,7 +61,7 @@ public class NoteDetectorIOSim implements NoteDetectorIO {
         inputs.hasTargets = false;
         if (Math.abs(vxAngle) <= Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_FOV_X_RAD/2 &&
             Math.abs(vyAngle) <= Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_FOV_Y_RAD/2 &&
-            dist <= Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_MAX_RANGE_METERS) {
+            minDist <= Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_MAX_RANGE_METERS) {
             inputs.hasTargets = true;
             inputs.vxRadians = vxAngle;
             inputs.vyRadians = vyAngle;

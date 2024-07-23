@@ -5,11 +5,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.AutoRunner;
 import frc.robot.commands.drivetrain.AbsoluteFieldDrive;
+import frc.robot.commands.intake.IntakeNote;
 import frc.robot.commands.shooter.ShooterStop;
 import frc.robot.commands.shooter.ShooterWindup;
 import frc.robot.lib.input.XboxController;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
 import frc.robot.subsystems.drivetrain.vision.NoteDetector;
+import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.pivot.flywheel.Flywheel;
 
 public class RobotContainer {
@@ -27,15 +30,22 @@ public class RobotContainer {
 
   private final NoteDetector noteDetector;
 
+  private final Intake intake;
+
+  private final Indexer indexer;
+
   public RobotContainer() {
     this.xboxTester = new XboxController(1);
     this.xboxOperator = new XboxController(2);
     this.xboxDriver = new XboxController(3);
 
-    
     swerveDrive = new SwerveDrive();
     flywheelSubsystem = new Flywheel();
     noteDetector = new NoteDetector(swerveDrive);
+    indexer = new Indexer(swerveDrive);
+    intake = new Intake(indexer);
+    indexer.setIntake(intake);
+
 
     autoRunner = new AutoRunner(swerveDrive);
     
@@ -44,8 +54,8 @@ public class RobotContainer {
     () -> MathUtil.applyDeadband(xboxDriver.getLeftX(), Constants.OperatorConstants.LEFT_X_DEADBAND),
     () -> MathUtil.applyDeadband(xboxDriver.getRightX(), Constants.OperatorConstants.RIGHT_X_DEADBAND)));
 
-    xboxOperator.getAButton().whileTrue(new ShooterWindup(flywheelSubsystem));
-    xboxOperator.getAButton().whileFalse(new ShooterStop(flywheelSubsystem));
+    xboxDriver.getAButton().whileTrue(new IntakeNote(intake));
+    // xboxOperator.getAButton().whileFalse(new ShooterStop(flywheelSubsystem));
 
     xboxTester.getAButton().whileTrue(swerveDrive.sysIDriveQuasistatic(Direction.kForward));
     xboxTester.getBButton().whileTrue(swerveDrive.sysIDriveQuasistatic(Direction.kReverse));

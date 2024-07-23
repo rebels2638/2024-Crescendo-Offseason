@@ -99,7 +99,19 @@ public final class Constants {
   }
 
   public static class FieldConstants {
-    public static final Translation3d kNOTE_3_TRANS = new Translation3d(8.23, 4.1, 0);
+    // mid 1, 2, 3, 4, 5 (top to bottom), ampside, mid, source
+    public static final Translation3d[] kNOTE_ARR = new Translation3d[] {
+      new Translation3d(8.28, 7.44, 0),
+      new Translation3d(8.28, 5.78, 0),
+      new Translation3d(8.28, 4.11, 0),
+      new Translation3d(8.28, 2.44, 0),
+      new Translation3d(8.28, 0.77, 0),
+      new Translation3d(2.89, 6.98, 0),
+      new Translation3d(2.89, 5.54, 0),
+      new Translation3d(2.89, 4.10, 0),
+    };
+
+    public static final double kNOTE_DIAMETER_METERS = 0.36;
   }
 
   public static class VisionConstants {
@@ -108,6 +120,11 @@ public final class Constants {
     public static final double kNOTE_DETECTOR_CAMERA_FOV_X_RAD = Math.toRadians(80);
     public static final double kNOTE_DETECTOR_CAMERA_FOV_Y_RAD = Math.toRadians(56);
     public static final double kNOTE_DETECTOR_CAMERA_MAX_RANGE_METERS = 2;
+  }
+
+  public static class IntakeConstants {
+    public static final double kROLLER_RADIUS_METERS = 0.025;
+    public static final Translation3d KINTAKE_TRANSLATION3D = new Translation3d(.38, 0, 0);
   }
 
 }
