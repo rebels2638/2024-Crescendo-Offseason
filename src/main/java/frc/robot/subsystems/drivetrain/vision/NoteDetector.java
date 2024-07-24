@@ -10,12 +10,14 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
-import frc.robot.subsystems.drivetrain.vision.NoteDetectorIOInputsAutoLogged;
 
 public class NoteDetector extends SubsystemBase {
     private final NoteDetectorIOInputsAutoLogged inputs = new NoteDetectorIOInputsAutoLogged();
     private NoteDetectorIO io;
     private final SwerveDrive swerveDrive;
+
+    private Translation3d prevSample = new Translation3d();
+
     public NoteDetector(SwerveDrive swerveDrive) {
         this.swerveDrive = swerveDrive;
         switch(Constants.currentMode) {
@@ -23,7 +25,7 @@ public class NoteDetector extends SubsystemBase {
                 io = new NoteDetectorIOSim(swerveDrive);
                 break;
             default: 
-                io = new NoteDetectorIO() {};
+                io = new NoteDetectorIOReal();
                 break;
         }
     }
@@ -41,7 +43,7 @@ public class NoteDetector extends SubsystemBase {
     }
 
     public Translation3d getNoteFeildRelativePose() {
-        if (!inputs.hasTargets) {return new Translation3d();}
+        if (!inputs.hasTargets) { return prevSample; }
 
         Rotation2d robotYaw = swerveDrive.getPose().getRotation();
         Translation2d cameraTranslation2d = Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_POSE.getTranslation().toTranslation2d();
@@ -67,6 +69,36 @@ public class NoteDetector extends SubsystemBase {
         sample = sample.rotateBy(cameraPose.getRotation());
         sample = sample.plus(cameraPose.getTranslation());
 
+        prevSample = sample;
         return sample;
+    }
+
+    public double getDrivetrainDistToNote() {
+        return swerveDrive.getPose().getTranslation().getDistance(getNoteFeildRelativePose().toTranslation2d());
+    }
+
+    public double intakeDistToNote() {
+        Rotation2d robotYaw = swerveDrive.getPose().getRotation();
+        Translation2d intakeTranslation2d = Constants.IntakeConstants.KINTAKE_TRANSLATION3D.toTranslation2d();
+        intakeTranslation2d = intakeTranslation2d.rotateBy(robotYaw);
+        intakeTranslation2d = intakeTranslation2d.plus(swerveDrive.getPose().getTranslation());
+
+        Translation3d intakeTranslation3d = new Translation3d(
+                                                    intakeTranslation2d.getX(), 
+                                                    intakeTranslation2d.getY(), 
+                                                    Constants.IntakeConstants.KINTAKE_TRANSLATION3D.getZ());
+       
+        return intakeTranslation3d.getDistance(getNoteFeildRelativePose());
+    }
+
+    public boolean notePresent() {
+        Logger.recordOutput("NoteDetector/intakeDistToNote", intakeDistToNote());
+        Logger.recordOutput("NoteDetector/drivetrainDistToNote", getDrivetrainDistToNote());
+
+        return (
+            hasTargets() || 
+            (intakeDistToNote() <= Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_BLIND_SPOT_DISTANCE_METERS && 
+            intakeDistToNote() < getDrivetrainDistToNote())
+        );
     }
 }

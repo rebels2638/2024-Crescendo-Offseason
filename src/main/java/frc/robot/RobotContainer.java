@@ -5,7 +5,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.AutoRunner;
 import frc.robot.commands.drivetrain.AbsoluteFieldDrive;
-import frc.robot.commands.intake.IntakeNote;
+import frc.robot.commands.drivetrain.IntakeNote;
+import frc.robot.commands.intake.RollIntakeIn;
 import frc.robot.commands.shooter.ShooterStop;
 import frc.robot.commands.shooter.ShooterWindup;
 import frc.robot.lib.input.XboxController;
@@ -42,7 +43,7 @@ public class RobotContainer {
     swerveDrive = new SwerveDrive();
     flywheelSubsystem = new Flywheel();
     noteDetector = new NoteDetector(swerveDrive);
-    indexer = new Indexer(swerveDrive);
+    indexer = new Indexer(swerveDrive, noteDetector);
     intake = new Intake(indexer);
     indexer.setIntake(intake);
 
@@ -54,7 +55,8 @@ public class RobotContainer {
     () -> MathUtil.applyDeadband(xboxDriver.getLeftX(), Constants.OperatorConstants.LEFT_X_DEADBAND),
     () -> MathUtil.applyDeadband(xboxDriver.getRightX(), Constants.OperatorConstants.RIGHT_X_DEADBAND)));
 
-    xboxDriver.getAButton().whileTrue(new IntakeNote(intake));
+    xboxDriver.getAButton().whileTrue(new IntakeNote(swerveDrive, intake, noteDetector));
+
     // xboxOperator.getAButton().whileFalse(new ShooterStop(flywheelSubsystem));
 
     xboxTester.getAButton().whileTrue(swerveDrive.sysIDriveQuasistatic(Direction.kForward));

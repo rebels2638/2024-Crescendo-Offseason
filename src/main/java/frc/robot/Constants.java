@@ -120,6 +120,8 @@ public final class Constants {
     public static final double kNOTE_DETECTOR_CAMERA_FOV_X_RAD = Math.toRadians(80);
     public static final double kNOTE_DETECTOR_CAMERA_FOV_Y_RAD = Math.toRadians(56);
     public static final double kNOTE_DETECTOR_CAMERA_MAX_RANGE_METERS = 2;
+    public static final double kNOTE_DETECTOR_CAMERA_BLIND_SPOT_DISTANCE_METERS = 0.3;
+
   }
 
   public static class IntakeConstants {
