@@ -37,7 +37,7 @@ public class Indexer extends SubsystemBase {
         this.intake = intake;
         switch (Constants.currentMode) {
             case SIM:
-                // io = new IndexerIOSim(swerveDrive, intake, noteDetector);
+                io = new IndexerIOSim(swerveDrive, intake, noteDetector);
                 break;
         
             default:

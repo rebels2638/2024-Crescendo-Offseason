@@ -22,7 +22,7 @@ import edu.wpi.first.math.geometry.Translation3d;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final Mode currentMode = Mode.REAL; // TODO: change this if sim
+  public static final Mode currentMode = Mode.SIM; // TODO: change this if sim
   // public static final boolean isSYSID = true; // TODO: change this if sysid
   public static enum Mode {
     /** Running on a real robot. */
@@ -116,9 +116,9 @@ public final class Constants {
 
   public static class VisionConstants {
     public static final Pose3d kNOTE_DETECTOR_CAMERA_POSE = 
-      new Pose3d(new Translation3d(.38, 0, .2), new Rotation3d(Math.toRadians(0), Math.toRadians(23), Math.toRadians(0)));
-    public static final double kNOTE_DETECTOR_CAMERA_FOV_X_RAD = Math.toRadians(80);
-    public static final double kNOTE_DETECTOR_CAMERA_FOV_Y_RAD = Math.toRadians(56);
+      new Pose3d(new Translation3d(0.15, 0.47, 0.67), new Rotation3d(Math.toRadians(0), Math.toRadians(23), Math.toRadians(360-63)));
+    public static final double kNOTE_DETECTOR_CAMERA_FOV_X_RAD = Math.toRadians(29.8 * 2);
+    public static final double kNOTE_DETECTOR_CAMERA_FOV_Y_RAD = Math.toRadians(24.85 * 2);
     public static final double kNOTE_DETECTOR_CAMERA_MAX_RANGE_METERS = 2;
     public static final double kNOTE_DETECTOR_CAMERA_BLIND_SPOT_DISTANCE_METERS = 0.3;
 

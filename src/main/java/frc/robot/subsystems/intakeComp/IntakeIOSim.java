@@ -3,6 +3,7 @@ package frc.robot.subsystems.intakeComp;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class IntakeIOSim extends SubsystemBase implements IntakeIO {
 
@@ -13,6 +14,8 @@ public class IntakeIOSim extends SubsystemBase implements IntakeIO {
         inputs.velocityRadSec = desiredVelocityRadSec;
         inputs.inIntake = true;
         inputs.reachedSetpoint = true;
+        inputs.velocityMps = inputs.velocityRadSec * Math.PI * 2 * Constants.IntakeConstants.kROLLER_RADIUS_METERS;
+        inputs.distanceMeters += inputs.velocityMps * 0.020;
     }
 
     @Override

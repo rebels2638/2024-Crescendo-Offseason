@@ -49,6 +49,11 @@ public class RobotContainer {
     this.xboxOperator = new XboxController(2);
     this.xboxDriver = new XboxController(3);
 
+    swerveDrive = new SwerveDrive();
+    flywheelSubsystem = new Flywheel();
+    noteDetector = new NoteDetector(swerveDrive);
+    indexer = new Indexer(swerveDrive, noteDetector);
+
     switch (Constants.currentMode) {
       case SIM:
         pivot = Pivot.setInstance(new Pivot(new PivotIOSim())); 
@@ -56,7 +61,7 @@ public class RobotContainer {
         break;
     
       case REAL:
-        intake = Intake.setInstance(new Intake(new IntakeIONeo()));
+        intake = Intake.setInstance(new Intake(new IntakeIONeo(indexer)));
         pivot = Pivot.setInstance(new Pivot(new PivotIONeo()));
         break;
 
@@ -66,10 +71,7 @@ public class RobotContainer {
         break;
     }
 
-    swerveDrive = new SwerveDrive();
-    flywheelSubsystem = new Flywheel();
-    noteDetector = new NoteDetector(swerveDrive);
-    indexer = new Indexer(swerveDrive, noteDetector);
+
     // intake = new Intake(indexer);
     indexer.setIntake(intake);
 

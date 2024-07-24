@@ -77,4 +77,12 @@ public class Intake extends SubsystemBase{
         Intake.instance = inst;
         return inst;
     }
+
+    public double getVelocityMps() {
+        return inputs.velocityMps;
+    }
+
+    public double getPoseMeters() {
+        return inputs.distanceMeters;
+    }
 }

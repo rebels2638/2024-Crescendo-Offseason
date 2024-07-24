@@ -7,10 +7,10 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.subsystems.indexer.Indexer;
 
 public class IntakeIONeo extends SubsystemBase implements IntakeIO {
     private final double kMotorToOutputShaftRatio = 0.25;
@@ -20,17 +20,17 @@ public class IntakeIONeo extends SubsystemBase implements IntakeIO {
     private SimpleMotorFeedforward velocityFeedForwardController = new SimpleMotorFeedforward(0, 0, 0);
 
     // private Rev2mDistanceSensor distanceSensor;
-    private double distanceTolerance;
     private double currentVelocityRadPerSec;
-    private boolean isIntaking;
-    private DigitalInput lineBreakSensor; 
+
 
     private GenericEntry IntakeStatus;
 
+    private final Indexer indexer;
 
     private static final double kMAX_VOLTAGE = 12;
 
-    public IntakeIONeo() {
+    public IntakeIONeo(Indexer indexer) {
+        this.indexer = indexer;
         m_motor.setIdleMode(CANSparkMax.IdleMode.kCoast);
         m_motor.clearFaults(); //TODO: ALWAYS CHECK FOR FAULTS IN COMPETITION DO NOT IGNORE THEM
         m_motor.setInverted(false);
@@ -38,7 +38,6 @@ public class IntakeIONeo extends SubsystemBase implements IntakeIO {
         // distanceTolerance = 0.57; //Approximate distance assuming some tolerance, CHECK AGAIN
         // distanceSensor.setEnabled(true);
 
-        lineBreakSensor = new DigitalInput(7);
         //distanceSensor.setAutomaticMode(true); << Probably not required but keep note that we need this if we have several of these 2m dist devices
 
         IntakeStatus = Shuffleboard.getTab("auto").add("INTAKE STATUS", inIntake()).getEntry();
@@ -47,6 +46,9 @@ public class IntakeIONeo extends SubsystemBase implements IntakeIO {
     @Override
     public void updateInputs(IntakeIOInputs inputs) {
         inputs.velocityRadSec = m_motor.getEncoder().getVelocity() / 60 * kMotorToOutputShaftRatio; // we divide by 60 because the motor out is in RPM
+        inputs.velocityMps = m_motor.getEncoder().getVelocity() / 60 * kMotorToOutputShaftRatio * Math.PI * 2 * Constants.IntakeConstants.kROLLER_RADIUS_METERS; // we divide by 60 because the motor out is in RPM
+        inputs.distanceMeters += inputs.velocityMps * 0.020;
+        
         inputs.reachedSetpoint = velocityFeedBackController.atSetpoint();
         inputs.inIntake = inIntake();
         currentVelocityRadPerSec = inputs.velocityRadSec;
@@ -108,9 +110,6 @@ public class IntakeIONeo extends SubsystemBase implements IntakeIO {
         velocityFeedBackController = vfb;
         velocityFeedForwardController = vff;
     }
-    public void setIntakeStatus(boolean s){
-        isIntaking = s;
-    }   
     
     public boolean inIntake() {
         //Valid range(?) check aka 2m or less
@@ -131,11 +130,7 @@ public class IntakeIONeo extends SubsystemBase implements IntakeIO {
         }
         */
 
-        if(!lineBreakSensor.get()){
-            return true; //Line is broken
-        }else{
-            return false; //Line is NOT broken
-        }
+        return indexer.inIntake();
 
     }
 

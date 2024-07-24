@@ -9,6 +9,8 @@ public interface IntakeIO {
     @AutoLog
     public static class IntakeIOInputs {
         public double velocityRadSec;
+        public double velocityMps;
+        public double distanceMeters;
         public boolean inIntake; 
         public boolean reachedSetpoint;
     }
