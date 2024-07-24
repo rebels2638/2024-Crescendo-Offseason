@@ -7,6 +7,7 @@ import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
 import frc.robot.subsystems.drivetrain.vision.NoteDetector;
 import frc.robot.subsystems.intakeComp.Intake;
+import frc.robot.subsystems.pivotComp.Pivot;
 
 public class Indexer extends SubsystemBase {
     private IndexerIO io;
@@ -33,11 +34,11 @@ public class Indexer extends SubsystemBase {
         return inputs.inShooter;
     }
 
-    public void setIntake(Intake intake) {
+    public void setSubsystem(Intake intake, Pivot pivot) {
         this.intake = intake;
         switch (Constants.currentMode) {
             case SIM:
-                io = new IndexerIOSim(swerveDrive, intake, noteDetector);
+                io = new IndexerIOSim(swerveDrive, intake, noteDetector, pivot);
                 break;
         
             default:

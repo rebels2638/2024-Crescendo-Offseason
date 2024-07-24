@@ -8,11 +8,11 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 public interface IntakeIO {
     @AutoLog
     public static class IntakeIOInputs {
-        public double velocityRadSec;
-        public double velocityMps;
-        public double distanceMeters;
-        public boolean inIntake; 
-        public boolean reachedSetpoint;
+        public double velocityRadSec = 0;
+        public double velocityMps = 0;
+        public double distanceMeters = 0;
+        public boolean inIntake = false; 
+        public boolean reachedSetpoint = false;
     }
 
     public default void updateInputs(IntakeIOInputs inputs) {}

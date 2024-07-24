@@ -11,17 +11,19 @@ import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
 import frc.robot.subsystems.drivetrain.vision.NoteDetector;
 import frc.robot.subsystems.intakeComp.Intake;
+import frc.robot.subsystems.pivotComp.Pivot;
 
 public class IndexerIOSim implements IndexerIO {
 
     private final SwerveDrive swerveDrive;
     private final Intake intake;
     private final NoteDetector noteDetector;
-    
+    private final Pivot pivot;
     private boolean contact = false;
     private double initialIntakePose = 0;
 
-    public IndexerIOSim(SwerveDrive swerveDrive, Intake intake, NoteDetector noteDetector) {
+    public IndexerIOSim(SwerveDrive swerveDrive, Intake intake, NoteDetector noteDetector, Pivot pivot) {
+        this.pivot = pivot;
         this.swerveDrive = swerveDrive;
         this.intake = intake;
         this.noteDetector = noteDetector;
@@ -42,22 +44,10 @@ public class IndexerIOSim implements IndexerIO {
         
         Logger.recordOutput("Indexer/intakePose", new Pose3d(intakeTranslation3d, new Rotation3d()));
 
-        // Translation3d closestNote = new Translation3d();
-        // double minDist = Double.MAX_VALUE;
-        // for (int i = 0; i < Constants.FieldConstants.kNOTE_ARR.length; i++) {
-        //     double dist = intakeTranslation3d.getDistance(Constants.FieldConstants.kNOTE_ARR[i]);
-        //     if (dist < minDist) {
-        //         minDist = dist;
-        //         closestNote = Constants.FieldConstants.kNOTE_ARR[i];
-        //     }
-        // }
-
         double dist = Double.MAX_VALUE;
-        if (/*noteDetector.hasTargets()*/ true) {
-            dist = noteDetector.getNoteFeildRelativePose().getDistance(intakeTranslation3d);
-        }
+        dist = noteDetector.getNoteFeildRelativePose().getDistance(intakeTranslation3d);
 
-        if (dist <= .1 && !contact && intake.getVelocityMps() >= .2) {
+        if (dist <= .1 && !contact && intake.getVelocityMps() >= .2 && pivot.getDegAngle() >= 60) {
             contact = true;
             initialIntakePose = intake.getPoseMeters();
         }

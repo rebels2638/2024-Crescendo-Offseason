@@ -1,5 +1,6 @@
-package frc.robot.commands.drivetrain;
+package frc.robot.commands.compositions;
 
+import java.io.SequenceInputStream;
 import java.net.InetSocketAddress;
 
 import org.littletonrobotics.junction.Logger;
@@ -15,11 +16,21 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
+import frc.robot.commands.intake.InIntake;
+import frc.robot.commands.intake.OutIntake;
 import frc.robot.commands.intake.RollIntakeIn;
+import frc.robot.commands.intake.RollIntakeInSlow;
+import frc.robot.commands.intake.RollIntakeOut;
+import frc.robot.commands.intake.StopIntake;
+import frc.robot.commands.pivot.PivotToTorus;
+import frc.robot.commands.pivot.PivotTurtle;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
 import frc.robot.subsystems.drivetrain.vision.NoteDetector;
 import frc.robot.subsystems.intakeComp.Intake;
+import frc.robot.subsystems.pivotComp.Pivot;
 
 public class IntakeNote extends Command {
     private final Intake intake;
@@ -31,17 +42,20 @@ public class IntakeNote extends Command {
     private final ProfiledPIDController m_rotationalController;
     // private final HolonomicDriveController controller;
 
+    private final Pivot pivot;
     private Rotation2d initialYaw = new Rotation2d();
+    private boolean over = false;
 
-    public IntakeNote(SwerveDrive swerveDrive, Intake intakeSubsystem, NoteDetector noteDetector) {
+    public IntakeNote(SwerveDrive swerveDrive, Intake intakeSubsystem, NoteDetector noteDetector, Pivot pivot) {
         this.intake = intakeSubsystem;
         this.noteDetector = noteDetector;
         this.swerveDrive = swerveDrive;
+        this.pivot = pivot;
 
         switch (Constants.currentMode) {
             case SIM:
-                m_translationalController = new PIDController(1, 0, 0);
-                m_rotationalController = new ProfiledPIDController(1, 0, 0,
+                m_translationalController = new PIDController(1.2, 0, 0);
+                m_rotationalController = new ProfiledPIDController(1.2, 0, 0,
                  new Constraints(Constants.Auton.MAX_ANGULAR_VELO_RPS * 2 * Math.PI, 
                  Constants.Auton.MAX_ANGULAR_ACCEL_RPS_SQUARED * 2 * Math.PI));
                 break;
@@ -62,8 +76,11 @@ public class IntakeNote extends Command {
 
     @Override
     public void initialize() {
-        Command intakeCommand = new RollIntakeIn();
-        intakeCommand.schedule();
+        SequentialCommandGroup startGroup = new SequentialCommandGroup(
+            new PivotToTorus(),
+            new RollIntakeIn()
+        );
+        startGroup.schedule();
         notePose = noteDetector.getNoteFeildRelativePose();
         initialYaw = swerveDrive.getPose().getRotation();
     }
@@ -92,6 +109,8 @@ public class IntakeNote extends Command {
                         noteDetector.getNoteFeildRelativePose().getY() - swerveDrive.getPose().getY(), 
                         noteDetector.getNoteFeildRelativePose().getX() - swerveDrive.getPose().getX());
 
+            initialYaw = new Rotation2d(desiredRotation);
+
             desiredSpeeds.omegaRadiansPerSecond = 
                 m_rotationalController.calculate(
                     robotYaw.getRadians(), desiredRotation);
@@ -99,30 +118,40 @@ public class IntakeNote extends Command {
             
             
             Logger.recordOutput("IntakeNoteCommand/desiredRotationRad", desiredRotation);
+            Logger.recordOutput("IntakeNoteCommand/desiredSpeeds", desiredSpeeds);
 
             swerveDrive.driveFieldRelative(desiredSpeeds);
         }
         else {
             ChassisSpeeds desiredSpeeds = new ChassisSpeeds(0, 0, 0);
-            desiredSpeeds.omegaRadiansPerSecond = desiredSpeeds.omegaRadiansPerSecond = 
-                m_rotationalController.calculate(
-                    robotYaw.getRadians(), 
-                    initialYaw.getRadians() + Math.toRadians(30)
-                );
-            Logger.recordOutput("IntakeNoteCommand/desiredRotationRad", initialYaw.getRadians() + Math.toRadians(30));
 
-            if (m_rotationalController.atSetpoint()) {
-                desiredSpeeds.omegaRadiansPerSecond = desiredSpeeds.omegaRadiansPerSecond = 
-                m_rotationalController.calculate(
-                    robotYaw.getRadians(), 
-                    initialYaw.getRadians() - Math.toRadians(30)
-                );
-                Logger.recordOutput("IntakeNoteCommand/desiredRotationRad", initialYaw.getRadians() - Math.toRadians(30));
+            if (over) {
+                double goal = initialYaw.getRadians() - Math.toRadians(30);
+                m_rotationalController.setGoal(goal);
+                if (m_rotationalController.atGoal()) {
+                    over = false;
+                }
+                else {
+                    desiredSpeeds.omegaRadiansPerSecond = desiredSpeeds.omegaRadiansPerSecond = 
+                    m_rotationalController.calculate(robotYaw.getRadians());
+                    Logger.recordOutput("IntakeNoteCommand/desiredRotationRad",goal);
+                }
 
+            }
+            else {
+                double goal = initialYaw.getRadians() + Math.toRadians(30);
+                m_rotationalController.setGoal(goal);
+                if (m_rotationalController.atGoal()) {
+                    over = true;
+                }
+                else {
+                    desiredSpeeds.omegaRadiansPerSecond = desiredSpeeds.omegaRadiansPerSecond = 
+                    m_rotationalController.calculate(robotYaw.getRadians());
+                    Logger.recordOutput("IntakeNoteCommand/desiredRotationRad", goal);
+                }
             }
             
             swerveDrive.driveFieldRelative(desiredSpeeds);
-
         }
         
     }
@@ -134,5 +163,29 @@ public class IntakeNote extends Command {
 
     @Override
     public void end(boolean interrupted) {
+        
+        Logger.recordOutput("IntakeNoteCommand/interrupted", interrupted);
+
+        SequentialCommandGroup endGroup = new SequentialCommandGroup(
+            new StopIntake(),
+            new PivotTurtle(),
+            new RollIntakeOut(), 
+            new WaitCommand(0.15),
+            new OutIntake(),
+            new StopIntake(), 
+            new RollIntakeInSlow(),
+            new InIntake(),
+            new WaitCommand(0.1),
+            new StopIntake()
+        );
+
+        if (interrupted) {
+            Command stop = new CancelIntakeNote(endGroup, null);
+            stop.schedule();
+            return;
+        }
+
+        endGroup.schedule();
     }
 }
+

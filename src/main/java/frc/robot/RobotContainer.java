@@ -4,8 +4,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.AutoRunner;
+import frc.robot.commands.compositions.IntakeNote;
 import frc.robot.commands.drivetrain.AbsoluteFieldDrive;
-import frc.robot.commands.drivetrain.IntakeNote;
 import frc.robot.commands.intake.RollIntakeIn;
 import frc.robot.commands.shooter.ShooterStop;
 import frc.robot.commands.shooter.ShooterWindup;
@@ -57,7 +57,7 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case SIM:
         pivot = Pivot.setInstance(new Pivot(new PivotIOSim())); 
-        intake = Intake.setInstance(new Intake(new IntakeIOSim())); //Assigns the instance object(pointer) to the variable so no new changes are needed.
+        intake = Intake.setInstance(new Intake(new IntakeIOSim(indexer))); //Assigns the instance object(pointer) to the variable so no new changes are needed.
         break;
     
       case REAL:
@@ -73,7 +73,7 @@ public class RobotContainer {
 
 
     // intake = new Intake(indexer);
-    indexer.setIntake(intake);
+    indexer.setSubsystem(intake, pivot);
 
 
     autoRunner = new AutoRunner(swerveDrive);
@@ -83,7 +83,7 @@ public class RobotContainer {
     () -> MathUtil.applyDeadband(xboxDriver.getLeftX(), Constants.OperatorConstants.LEFT_X_DEADBAND),
     () -> MathUtil.applyDeadband(xboxDriver.getRightX(), Constants.OperatorConstants.RIGHT_X_DEADBAND)));
 
-    xboxDriver.getAButton().whileTrue(new IntakeNote(swerveDrive, intake, noteDetector));
+    xboxDriver.getAButton().whileTrue(new IntakeNote(swerveDrive, intake, noteDetector, pivot));
 
     // xboxOperator.getAButton().whileFalse(new ShooterStop(flywheelSubsystem));
 
