@@ -2,14 +2,11 @@ package frc.robot.subsystems.indexer;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
 import frc.robot.subsystems.drivetrain.vision.NoteDetector;
-import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intakeComp.Intake;
 
 public class Indexer extends SubsystemBase {
     private IndexerIO io;
@@ -40,7 +37,7 @@ public class Indexer extends SubsystemBase {
         this.intake = intake;
         switch (Constants.currentMode) {
             case SIM:
-                io = new IndexerIOSim(swerveDrive, intake, noteDetector);
+                // io = new IndexerIOSim(swerveDrive, intake, noteDetector);
                 break;
         
             default:

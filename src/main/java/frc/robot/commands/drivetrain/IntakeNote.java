@@ -19,7 +19,7 @@ import frc.robot.Constants;
 import frc.robot.commands.intake.RollIntakeIn;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
 import frc.robot.subsystems.drivetrain.vision.NoteDetector;
-import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intakeComp.Intake;
 
 public class IntakeNote extends Command {
     private final Intake intake;
@@ -62,7 +62,7 @@ public class IntakeNote extends Command {
 
     @Override
     public void initialize() {
-        Command intakeCommand = new RollIntakeIn(intake);
+        Command intakeCommand = new RollIntakeIn();
         intakeCommand.schedule();
         notePose = noteDetector.getNoteFeildRelativePose();
         initialYaw = swerveDrive.getPose().getRotation();

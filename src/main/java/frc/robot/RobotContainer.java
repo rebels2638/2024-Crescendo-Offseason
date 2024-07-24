@@ -13,7 +13,14 @@ import frc.robot.lib.input.XboxController;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
 import frc.robot.subsystems.drivetrain.vision.NoteDetector;
 import frc.robot.subsystems.indexer.Indexer;
-import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intakeComp.Intake;
+import frc.robot.subsystems.intakeComp.IntakeIO;
+import frc.robot.subsystems.intakeComp.IntakeIONeo;
+import frc.robot.subsystems.intakeComp.IntakeIOSim;
+import frc.robot.subsystems.pivotComp.Pivot;
+import frc.robot.subsystems.pivotComp.PivotIO;
+import frc.robot.subsystems.pivotComp.PivotIONeo;
+import frc.robot.subsystems.pivotComp.PivotIOSim;
 import frc.robot.subsystems.shooter.pivot.flywheel.Flywheel;
 
 public class RobotContainer {
@@ -31,20 +38,39 @@ public class RobotContainer {
 
   private final NoteDetector noteDetector;
 
-  private final Intake intake;
+  private final Intake intake; // from comp
+  private final Pivot pivot;
 
   private final Indexer indexer;
+
 
   public RobotContainer() {
     this.xboxTester = new XboxController(1);
     this.xboxOperator = new XboxController(2);
     this.xboxDriver = new XboxController(3);
 
+    switch (Constants.currentMode) {
+      case SIM:
+        pivot = Pivot.setInstance(new Pivot(new PivotIOSim())); 
+        intake = Intake.setInstance(new Intake(new IntakeIOSim())); //Assigns the instance object(pointer) to the variable so no new changes are needed.
+        break;
+    
+      case REAL:
+        intake = Intake.setInstance(new Intake(new IntakeIONeo()));
+        pivot = Pivot.setInstance(new Pivot(new PivotIONeo()));
+        break;
+
+      default:
+        pivot = Pivot.setInstance(new Pivot(new PivotIO(){}));
+        intake = Intake.setInstance(new Intake(new IntakeIO(){}));
+        break;
+    }
+
     swerveDrive = new SwerveDrive();
     flywheelSubsystem = new Flywheel();
     noteDetector = new NoteDetector(swerveDrive);
     indexer = new Indexer(swerveDrive, noteDetector);
-    intake = new Intake(indexer);
+    // intake = new Intake(indexer);
     indexer.setIntake(intake);
 
 
