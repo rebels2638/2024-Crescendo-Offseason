@@ -251,14 +251,12 @@ public class SwerveDrive extends SubsystemBase {
         Logger.recordOutput("SwerveDrive/correctedSpeeds", correctedSpeeds);
 
         SwerveModuleState[] desiredModuleStates = m_kinematics.toSwerveModuleStates(correctedSpeeds);
-        // if (Math.abs(desiredRobotRelativeSpeeds.vxMetersPerSecond) <= 0.01 && 
-        //     Math.abs(desiredRobotRelativeSpeeds.vyMetersPerSecond) <= 0.01 && 
-        //     Math.abs(desiredRobotRelativeSpeeds.omegaRadiansPerSecond) <= 0.1) {
-        //     desiredModuleStates = measuredModuleStates;
-        //     for (int i = 0; i < 4; i++) {
-        //         desiredModuleStates[i].speedMetersPerSecond = 0;
-        //     }
-        // } 
+        if (Math.abs(desiredRobotRelativeSpeeds.vxMetersPerSecond) <= 0.01 && 
+            Math.abs(desiredRobotRelativeSpeeds.vyMetersPerSecond) <= 0.01 && 
+            Math.abs(desiredRobotRelativeSpeeds.omegaRadiansPerSecond) <= 0.1) {
+            desiredModuleStates = measuredModuleStates;
+        } 
+        
         for (int i = 0; i < 4; i++) {
             Logger.recordOutput("SwerveDrive/unoptimizedDesiredModuleStates", desiredModuleStates);
 
