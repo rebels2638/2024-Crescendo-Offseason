@@ -65,7 +65,11 @@ public class NoteDetector extends SubsystemBase {
         Logger.recordOutput("NoteDetector/cameraPose", cameraPose);
 
 
-        Translation3d sample = new Translation3d(dist * Math.cos(inputs.vxRadians), dist * Math.sin(inputs.vxRadians), dist * Math.sin(inputs.vyRadians));
+        Translation3d sample = new Translation3d(
+            dist * Math.cos(inputs.vxRadians), 
+            dist * Math.sin(inputs.vxRadians), 
+            dist * Math.sin(inputs.vyRadians));
+
         sample = sample.rotateBy(cameraPose.getRotation());
         sample = sample.plus(cameraPose.getTranslation());
 
