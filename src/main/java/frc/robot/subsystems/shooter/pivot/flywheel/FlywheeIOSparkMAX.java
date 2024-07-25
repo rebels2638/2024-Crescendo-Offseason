@@ -1,6 +1,9 @@
 package frc.robot.subsystems.shooter.pivot.flywheel;
 
 import com.revrobotics.CANSparkBase.IdleMode;
+
+import frc.robot.subsystems.indexer.Indexer;
+
 import com.revrobotics.CANSparkMax;
 
 public class FlywheeIOSparkMAX implements FlywheeIO{
