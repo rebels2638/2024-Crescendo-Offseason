@@ -70,8 +70,8 @@ public class NoteDetector extends SubsystemBase {
             dist * Math.sin(inputs.vxRadians), 
             dist * Math.sin(inputs.vyRadians));
 
-        sample = sample.rotateBy(cameraPose.getRotation());
         sample = sample.plus(cameraPose.getTranslation());
+        sample = sample.rotateBy(cameraPose.getRotation());
 
         prevSample = sample;
         return sample;

@@ -34,7 +34,7 @@ import frc.robot.subsystems.pivotComp.Pivot;
 import frc.robot.subsystems.pivotComp.PivotIO;
 import frc.robot.subsystems.pivotComp.PivotIONeo;
 import frc.robot.subsystems.pivotComp.PivotIOSim;
-import frc.robot.subsystems.shooter.pivot.flywheel.Flywheel;
+// import frc.robot.subsystems.shooter.pivot.flywheel.Flywheel;
 import frc.robot.subsystems.shooterComp.Shooter;
 import frc.robot.subsystems.shooterComp.ShooterIO;
 import frc.robot.subsystems.shooterComp.ShooterIONeo;
@@ -47,7 +47,7 @@ public class RobotContainer {
   private final XboxController xboxDriver;
   private final XboxController xboxOperator;
 
-  private final Flywheel flywheelSubsystem;
+  // private final Flywheel flywheelSubsystem;
 
   private final SwerveDrive swerveDrive;
 
@@ -71,7 +71,7 @@ public class RobotContainer {
     this.xboxDriver = new XboxController(3);
 
     swerveDrive = new SwerveDrive();
-    flywheelSubsystem = new Flywheel();
+    // flywheelSubsystem = new Flywheel();
     noteDetector = new NoteDetector(swerveDrive);
     indexer = new Indexer(swerveDrive, noteDetector);
 
@@ -109,9 +109,9 @@ public class RobotContainer {
     autoRunner = new AutoRunner(swerveDrive);
     
     swerveDrive.setDefaultCommand(new AbsoluteFieldDrive(swerveDrive, 
-    () -> MathUtil.applyDeadband(xboxDriver.getLeftY(), Constants.OperatorConstants.LEFT_Y_DEADBAND),
-    () -> MathUtil.applyDeadband(xboxDriver.getLeftX(), Constants.OperatorConstants.LEFT_X_DEADBAND),
-    () -> MathUtil.applyDeadband(xboxDriver.getRightX(), Constants.OperatorConstants.RIGHT_X_DEADBAND)));
+    () -> MathUtil.applyDeadband(-xboxDriver.getLeftY(), Constants.OperatorConstants.LEFT_Y_DEADBAND),
+    () -> MathUtil.applyDeadband(-xboxDriver.getLeftX(), Constants.OperatorConstants.LEFT_X_DEADBAND),
+    () -> MathUtil.applyDeadband(-xboxDriver.getRightX(), Constants.OperatorConstants.RIGHT_X_DEADBAND)));
 
 
     // OP Controlls
