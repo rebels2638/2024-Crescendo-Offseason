@@ -28,13 +28,13 @@ public class GyroIONavX implements GyroIO {
     public void updateInputs(GyroIOInputs inputs) {
         inputs.isConnected = gyro.isConnected();
         if (inputs.isConnected) {
-            inputs.yaw = new Rotation2d(Math.toRadians(gyro.getYaw()) - offset.getZ());
+            inputs.yaw = new Rotation2d(-(Math.toRadians(gyro.getYaw()) - offset.getZ()));
         }
     }
 
     @Override
     public void zero() {
-        offset = gyro.getRotation3d();
+        gyro.zeroYaw();
     }
 
     @Override

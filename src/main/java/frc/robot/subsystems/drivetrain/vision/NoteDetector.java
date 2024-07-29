@@ -58,15 +58,15 @@ public class NoteDetector extends SubsystemBase {
 
         Translation2d realtiveTranslation2d = new Translation2d(xMeters, yMeters);
         Translation2d absoluteTranslation2d = realtiveTranslation2d.
-            plus(Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_POSE.getTranslation().toTranslation2d()).
+            minus(Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_POSE.getTranslation().toTranslation2d()).
             rotateBy(
-                new Rotation2d(-Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_POSE.getRotation().getZ())).
+                new Rotation2d(Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_POSE.getRotation().getZ())).
             rotateBy(
-                new Rotation2d(swerveDrive.getPose().getRotation().getRadians())).
-            plus(swerveDrive.getPose().getTranslation());
+                new Rotation2d(swerveDrive.getPose().getRotation().getRadians()))/* .
+            minus(swerveDrive.getPose().getTranslation())*/;
         
+        absoluteTranslation2d = swerveDrive.getPose().getTranslation().minus(absoluteTranslation2d);
         prevSample = absoluteTranslation2d;
-
         return absoluteTranslation2d;
     }
 

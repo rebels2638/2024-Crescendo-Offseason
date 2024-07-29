@@ -72,7 +72,7 @@ public final class Constants {
   }
 
   public static class DrivetrainConstants {
-    public static final double kMAX_SPEED_METERS_PER_SECOND = 4;
+    public static final double kMAX_SPEED_METERS_PER_SECOND = 2;
     public static final double kMAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2;
     public static final double kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
     public static final double kMAX_ANGULAR_ACCELERATION_RADIANS_PER_SECOND_SQUARED = 2 * Math.PI;
@@ -116,7 +116,7 @@ public final class Constants {
 
   public static class VisionConstants {
     public static final Pose3d kNOTE_DETECTOR_CAMERA_POSE = 
-      new Pose3d(new Translation3d(0.15, 0.47, 0.67), new Rotation3d(Math.toRadians(0), Math.toRadians(30), Math.toRadians(-27)));
+      new Pose3d(new Translation3d(-0.47, -0.15, 0.67), new Rotation3d(Math.toRadians(0), Math.toRadians(30), Math.toRadians(25)));
     public static final double kNOTE_DETECTOR_CAMERA_FOV_X_RAD = Math.toRadians(29.8 * 2);
     public static final double kNOTE_DETECTOR_CAMERA_FOV_Y_RAD = Math.toRadians(24.85 * 2);
     public static final double kNOTE_DETECTOR_CAMERA_MAX_RANGE_METERS = 2;

@@ -109,9 +109,9 @@ public class RobotContainer {
     autoRunner = new AutoRunner(swerveDrive);
     
     swerveDrive.setDefaultCommand(new AbsoluteFieldDrive(swerveDrive, 
-    () -> MathUtil.applyDeadband(-xboxDriver.getLeftY(), Constants.OperatorConstants.LEFT_Y_DEADBAND),
-    () -> MathUtil.applyDeadband(-xboxDriver.getLeftX(), Constants.OperatorConstants.LEFT_X_DEADBAND),
-    () -> MathUtil.applyDeadband(-xboxDriver.getRightX(), Constants.OperatorConstants.RIGHT_X_DEADBAND)));
+    () -> -MathUtil.applyDeadband(xboxDriver.getLeftY(), Constants.OperatorConstants.LEFT_Y_DEADBAND),
+    () -> -MathUtil.applyDeadband(xboxDriver.getLeftX(), Constants.OperatorConstants.LEFT_X_DEADBAND),
+    () -> -MathUtil.applyDeadband(xboxDriver.getRightX(), Constants.OperatorConstants.RIGHT_X_DEADBAND)));
 
 
     // OP Controlls
