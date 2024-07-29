@@ -116,7 +116,7 @@ public final class Constants {
 
   public static class VisionConstants {
     public static final Pose3d kNOTE_DETECTOR_CAMERA_POSE = 
-      new Pose3d(new Translation3d(0.15, 0.47, 0.67), new Rotation3d(Math.toRadians(0), Math.toRadians(23), Math.toRadians(270 + 63)));
+      new Pose3d(new Translation3d(0.15, 0.47, 0.67)/*0.47 */, new Rotation3d(Math.toRadians(0), Math.toRadians(23), Math.toRadians(-27))); // 270 + 63
     public static final double kNOTE_DETECTOR_CAMERA_FOV_X_RAD = Math.toRadians(29.8 * 2);
     public static final double kNOTE_DETECTOR_CAMERA_FOV_Y_RAD = Math.toRadians(24.85 * 2);
     public static final double kNOTE_DETECTOR_CAMERA_MAX_RANGE_METERS = 2;

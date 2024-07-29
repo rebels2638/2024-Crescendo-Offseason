@@ -11,8 +11,8 @@ public class NoteDetectorIOReal implements NoteDetectorIO {
     }
     public void updateInputs(NoteDetectorIOInputs inputs) {
         inputs.hasTargets = llTable.getEntry("tv").getDouble(0) == 1;
-        inputs.vxRadians = Math.toRadians(llTable.getEntry("tx").getDouble(0));
-        inputs.vyRadians = Math.toRadians(llTable.getEntry("ty").getDouble(0));
+        inputs.txRadians = Math.toRadians(llTable.getEntry("tx").getDouble(0));
+        inputs.tyRadians = Math.toRadians(llTable.getEntry("ty").getDouble(0));
     }
 
 }

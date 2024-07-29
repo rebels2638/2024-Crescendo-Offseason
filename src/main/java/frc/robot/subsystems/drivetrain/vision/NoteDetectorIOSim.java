@@ -44,27 +44,33 @@ public class NoteDetectorIOSim implements NoteDetectorIO {
                 closestNote = Constants.FieldConstants.kNOTE_ARR[i];
             }
         }
-        double vxAngle = (Math.atan2(closestNote.getY() - cameraPose.getY(), 
+        double vxAngle = ((Math.atan2(closestNote.getY() - cameraPose.getY(), 
                                     closestNote.getX() - cameraPose.getX()) - 
-                                    cameraPose.getRotation().getZ()) % (Math.PI * 2);
+                                    cameraPose.getRotation().getZ())) % (2 * Math.PI);
 
         double x = Math.sqrt(Math.pow(closestNote.getY() - cameraPose.getY(), 2) +
                                 Math.pow(closestNote.getX() - cameraPose.getX(), 2));
 
-        double vyAngle = (Math.atan2(closestNote.getZ() - cameraPose.getZ(), x) + 
-                        cameraPose.getRotation().getY()) % (Math.PI * 2);
+        double vyAngle = ((Math.atan2(closestNote.getZ() - cameraPose.getZ(), x) + 
+                            cameraPose.getRotation().getY())) % (2 * Math.PI);
         
 
-        Logger.recordOutput("NoteDetector/vxAngle", vxAngle);
-        Logger.recordOutput("NoteDetector/vyAngle", vyAngle);
+        if (vxAngle <= -Math.PI) {
+            vxAngle += 2 * Math.PI;
+        }
+        else if (vxAngle >= 180) {
+            vxAngle -= 2 * Math.PI;
+        }
+        Logger.recordOutput("NoteDetector/txAngleDeg", Math.toDegrees(vxAngle));
+        Logger.recordOutput("NoteDetector/tyAngleDeg", Math.toDegrees(vyAngle));
 
         inputs.hasTargets = false;
         if (Math.abs(vxAngle) <= Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_FOV_X_RAD/2 &&
             Math.abs(vyAngle) <= Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_FOV_Y_RAD/2 &&
             minDist <= Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_MAX_RANGE_METERS) {
             inputs.hasTargets = true;
-            inputs.vxRadians = vxAngle;
-            inputs.vyRadians = vyAngle;
+            inputs.txRadians = -vxAngle;
+            inputs.tyRadians = vyAngle;
         }
 
     }

@@ -36,7 +36,7 @@ public class IntakeNote extends Command {
     private final Intake intake;
     private final NoteDetector noteDetector;
     private final SwerveDrive swerveDrive;
-    private Translation3d notePose = new Translation3d();
+    private Translation2d notePose = new Translation2d();
 
     private final PIDController m_translationalController;
     private final ProfiledPIDController m_rotationalController;

@@ -5,8 +5,8 @@ import org.littletonrobotics.junction.AutoLog;
 public interface NoteDetectorIO {
     @AutoLog
     public static class NoteDetectorIOInputs {
-        public double vxRadians = 0;
-        public double vyRadians = 0;
+        public double txRadians = 0;
+        public double tyRadians = 0;
         public boolean hasTargets = false;
     }
 
