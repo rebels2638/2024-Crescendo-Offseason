@@ -35,14 +35,14 @@ public class NoteDetector extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("NoteDetector", inputs);
 
-        Logger.recordOutput("NoteDetector/estimNotePose", new Translation3d(getNoteFeildRelativePose().getX(), getNoteFeildRelativePose().getY(),0));
+        Logger.recordOutput("NoteDetector/estimNotePose", new Translation3d(getNoteFieldRelativePose().getX(), getNoteFieldRelativePose().getY(),0));
     }
 
     public boolean hasTargets() {
         return inputs.hasTargets;
     }
 
-    public Translation2d getNoteFeildRelativePose() {
+    public Translation2d getNoteFieldRelativePose() {
         if (!inputs.hasTargets) { return prevSample; }
 
         double pitch = Math.PI / 2 - (Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_POSE.getRotation().getY() - inputs.tyRadians);
@@ -78,8 +78,7 @@ public class NoteDetector extends SubsystemBase {
 
         Translation2d realtiveTranslation2d = new Translation2d(xMeters, yMeters);
         Translation2d absoluteTranslation2d = realtiveTranslation2d.
-            rotateBy(
-                new Rotation2d(cameraPose.getRotation().getZ()));
+            rotateBy(new Rotation2d(cameraPose.getRotation().getZ()));
         
         absoluteTranslation2d = swerveDrive.getPose().getTranslation().minus(absoluteTranslation2d);
         prevSample = absoluteTranslation2d;
@@ -87,7 +86,7 @@ public class NoteDetector extends SubsystemBase {
     }
 
     public double getDrivetrainDistToNote() {
-        return swerveDrive.getPose().getTranslation().getDistance(getNoteFeildRelativePose());
+        return swerveDrive.getPose().getTranslation().getDistance(getNoteFieldRelativePose());
     }
 
     public double intakeDistToNote() {
@@ -101,7 +100,7 @@ public class NoteDetector extends SubsystemBase {
                                                     intakeTranslation2d.getY(), 
                                                     Constants.IntakeConstants.KINTAKE_TRANSLATION3D.getZ());
        
-        return intakeTranslation3d.getDistance(new Translation3d(getNoteFeildRelativePose().getX(), getNoteFeildRelativePose().getY(), 0));
+        return intakeTranslation3d.getDistance(new Translation3d(getNoteFieldRelativePose().getX(), getNoteFieldRelativePose().getY(), 0));
     }
 
     public boolean notePresent() {

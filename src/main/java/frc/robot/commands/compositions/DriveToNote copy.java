@@ -83,7 +83,7 @@
 //             new RollIntakeIn()
 //         );
 //         startGroup.schedule();
-//         notePose = noteDetector.getNoteFeildRelativePose();
+//         notePose = noteDetector.getNoteFieldRelativePose();
 //         initialYaw = swerveDrive.getPose().getRotation();
 //     }
 
@@ -103,13 +103,13 @@
 //         if (noteDetector.notePresent()) {
 //             ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
 //             desiredSpeeds.vxMetersPerSecond = 
-//                 m_translationalController.calculate(intakeTranslation3d.getX(), noteDetector.getNoteFeildRelativePose().getX());
+//                 m_translationalController.calculate(intakeTranslation3d.getX(), noteDetector.getNoteFieldRelativePose().getX());
 //             desiredSpeeds.vyMetersPerSecond = 
-//                 m_translationalController.calculate(intakeTranslation3d.getY(), noteDetector.getNoteFeildRelativePose().getY());
+//                 m_translationalController.calculate(intakeTranslation3d.getY(), noteDetector.getNoteFieldRelativePose().getY());
 
 //             double desiredRotation = Math.atan2(
-//                         noteDetector.getNoteFeildRelativePose().getY() - swerveDrive.getPose().getY(), 
-//                         noteDetector.getNoteFeildRelativePose().getX() - swerveDrive.getPose().getX());
+//                         noteDetector.getNoteFieldRelativePose().getY() - swerveDrive.getPose().getY(), 
+//                         noteDetector.getNoteFieldRelativePose().getX() - swerveDrive.getPose().getX());
 
 //             initialYaw = new Rotation2d(desiredRotation);
 

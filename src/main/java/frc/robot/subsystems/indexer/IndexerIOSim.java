@@ -45,7 +45,7 @@ public class IndexerIOSim implements IndexerIO {
         Logger.recordOutput("Indexer/intakePose", new Pose3d(intakeTranslation3d, new Rotation3d()));
 
         double dist = Double.MAX_VALUE;
-        dist = noteDetector.getNoteFeildRelativePose().getDistance(intakeTranslation3d.toTranslation2d());
+        dist = noteDetector.getNoteFieldRelativePose().getDistance(intakeTranslation3d.toTranslation2d());
 
         if (dist <= .1 && !contact && intake.getVelocityMps() >= .2 && pivot.getDegAngle() >= 60) {
             contact = true;

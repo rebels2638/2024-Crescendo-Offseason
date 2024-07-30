@@ -72,7 +72,7 @@ public class DriveToNote extends Command {
 
         Logger.recordOutput("IntakeNoteCommand/notePresent", noteDetector.notePresent());
         if (noteDetector.hasTargets()) {
-            Translation2d noteTranslation2d = noteDetector.getNoteFeildRelativePose();
+            Translation2d noteTranslation2d = noteDetector.getNoteFieldRelativePose();
             ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
             desiredSpeeds.vxMetersPerSecond = 
                 m_translationalController.calculate(intakeTranslation3d.getX(), noteTranslation2d.getX());
@@ -89,7 +89,6 @@ public class DriveToNote extends Command {
                 m_rotationalController.calculate(
                     robotYaw.getRadians(), desiredRotation);
 
-            
             
             Logger.recordOutput("IntakeNoteCommand/desiredRotationRad", desiredRotation);
             Logger.recordOutput("IntakeNoteCommand/desiredSpeeds", desiredSpeeds);
