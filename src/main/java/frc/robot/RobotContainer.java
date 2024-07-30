@@ -133,7 +133,7 @@ public class RobotContainer {
     this.xboxDriver.getLeftBumper().onTrue(new IntakeNote(swerveDrive, intake, noteDetector));
 
     this.xboxDriver.getRightMiddleButton().onTrue(new RollIntakeEject());
-    this.xboxDriver.getRightBumper().onTrue(new CancelIntakeNote(intakeG, feedHold));
+    this.xboxDriver.getRightBumper().onTrue(new CancelIntakeNote(intakeG, feedHold, swerveDrive));
     // this.xboxDriver.getLeftMiddleButton().onTrue(new InstantCommand(()-> pivot.zeroAngle()));
     this.xboxDriver.getYButton().onTrue(new InstantCommand(()-> Pivot.getInstance().TorusAngleReset()));
 
