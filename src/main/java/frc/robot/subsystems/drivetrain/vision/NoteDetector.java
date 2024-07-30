@@ -2,7 +2,9 @@ package frc.robot.subsystems.drivetrain.vision;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -55,15 +57,29 @@ public class NoteDetector extends SubsystemBase {
         Logger.recordOutput("NoteDetector/xMeters", xMeters);
         Logger.recordOutput("NoteDetector/yMeters", yMeters);
 
+        Rotation2d robotYaw = swerveDrive.getPose().getRotation();
+        Translation2d cameraTranslation2d = Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_POSE.getTranslation().toTranslation2d();
+        cameraTranslation2d = cameraTranslation2d.rotateBy(robotYaw);
+        cameraTranslation2d = cameraTranslation2d.plus(swerveDrive.getPose().getTranslation());
+
+        Translation3d cameraTranslation = new Translation3d(
+                                                    cameraTranslation2d.getX(), 
+                                                    cameraTranslation2d.getY(), 
+                                                    Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_POSE.getTranslation().getZ());
+        Rotation3d cameraRotation = new Rotation3d(
+                                                    Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_POSE.getRotation().getX(),
+                                                    Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_POSE.getRotation().getY(),
+                                                    Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_POSE.getRotation().getZ() + robotYaw.getRadians());
+        
+        Pose3d cameraPose = new Pose3d(cameraTranslation, cameraRotation);
+        
+        Logger.recordOutput("NoteDetector/cameraPose", cameraPose);
+
 
         Translation2d realtiveTranslation2d = new Translation2d(xMeters, yMeters);
         Translation2d absoluteTranslation2d = realtiveTranslation2d.
-            minus(Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_POSE.getTranslation().toTranslation2d()).
             rotateBy(
-                new Rotation2d(Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_POSE.getRotation().getZ())).
-            rotateBy(
-                new Rotation2d(swerveDrive.getPose().getRotation().getRadians()))/* .
-            minus(swerveDrive.getPose().getTranslation())*/;
+                new Rotation2d(cameraPose.getRotation().getZ()));
         
         absoluteTranslation2d = swerveDrive.getPose().getTranslation().minus(absoluteTranslation2d);
         prevSample = absoluteTranslation2d;

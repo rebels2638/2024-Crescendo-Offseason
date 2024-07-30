@@ -9,6 +9,7 @@ import frc.robot.commands.AutoRunner;
 import frc.robot.commands.compositions.CancelIntakeNote;
 import frc.robot.commands.compositions.FeedAndHoldNote;
 import frc.robot.commands.compositions.IntakeNote;
+import frc.robot.commands.compositions.DriveToNote;
 import frc.robot.commands.compositions.ScoreAMP;
 import frc.robot.commands.compositions.ShootNoteTele;
 import frc.robot.commands.drivetrain.AbsoluteFieldDrive;
@@ -129,10 +130,11 @@ public class RobotContainer {
 
     // driver controlls
     this.xboxDriver.getXButton().onTrue(new InstantCommand(() -> swerveDrive.zeroGyro()));
-    this.xboxDriver.getLeftBumper().whileTrue(new IntakeNote(swerveDrive, intake, noteDetector, pivot));
+    this.xboxDriver.getLeftBumper().onTrue(new IntakeNote(swerveDrive, intake, noteDetector));
+
     this.xboxDriver.getRightMiddleButton().onTrue(new RollIntakeEject());
     this.xboxDriver.getRightBumper().onTrue(new CancelIntakeNote(intakeG, feedHold));
-    this.xboxDriver.getLeftMiddleButton().onTrue(new InstantCommand(()-> pivot.zeroAngle()));
+    // this.xboxDriver.getLeftMiddleButton().onTrue(new InstantCommand(()-> pivot.zeroAngle()));
     this.xboxDriver.getYButton().onTrue(new InstantCommand(()-> Pivot.getInstance().TorusAngleReset()));
 
     // SYSID STUFF
