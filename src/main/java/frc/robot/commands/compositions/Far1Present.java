@@ -24,7 +24,7 @@ public class Far1Present extends Command {
     }
 
     private boolean almost_equal(Pose2d a, Pose2d b) {
-      return Math.abs(Math.atan(a.getY()/a.getX())-Math.atan(b.getY()/b.getX())) < 10 && a.getTranslation().getDistance(b.getTranslation()) < 1.5; // deg and meter
+      return Math.abs(Math.atan(a.getY()/a.getX())-Math.atan(b.getY()/b.getX())) < 10 && Math.abs(a.getTranslation().getDistance(b.getTranslation())) < 1.5; // deg and meter
     }
 
     @Override
