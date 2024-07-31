@@ -22,7 +22,7 @@ import edu.wpi.first.math.geometry.Translation3d;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final Mode currentMode = Mode.REAL; // TODO: change this if sim
+  public static final Mode currentMode = Mode.SIM; // TODO: change this if sim
   // public static final boolean isSYSID = true; // TODO: change this if sysid
   public static enum Mode {
     /** Running on a real robot. */
@@ -52,10 +52,10 @@ public final class Constants {
   public static final class Auton
   {
 
-    public static final PIDConstants TRANSLATION_PID_CONFIG = new PIDConstants(0, 0, 0.0000);
-    public static final PIDConstants ANGLE_PID_CONFIG = new PIDConstants(0, 0, 0.0); 
+    public static final PIDConstants TRANSLATION_PID_CONFIG = new PIDConstants(1, 0, 0.0000);
+    public static final PIDConstants ANGLE_PID_CONFIG = new PIDConstants(1.2, 0, 0.0); 
 
-    public static final double MAX_SPEED = 4.5;
+    public static final double MAX_SPEED = 4;
     public static final double MAX_ACCELERATION = 2;
     public static final double MAX_ANGULAR_VELO_RPS = 2; // 1
     public static final double MAX_ANGULAR_ACCEL_RPS_SQUARED = 1; // 0.5
@@ -72,7 +72,7 @@ public final class Constants {
   }
 
   public static class DrivetrainConstants {
-    public static final double kMAX_SPEED_METERS_PER_SECOND = 2;
+    public static final double kMAX_SPEED_METERS_PER_SECOND = 4;
     public static final double kMAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2;
     public static final double kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
     public static final double kMAX_ANGULAR_ACCELERATION_RADIANS_PER_SECOND_SQUARED = 2 * Math.PI;
