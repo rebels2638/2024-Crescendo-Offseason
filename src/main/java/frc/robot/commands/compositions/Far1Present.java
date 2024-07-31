@@ -33,7 +33,7 @@ public class Far1Present extends Command {
       Pose2d ideal = new Pose2d(Constants.FieldConstants.kNOTE_ARR[0].getX(), Constants.FieldConstants.kNOTE_ARR[0].getY(), new Rotation2d()).relativeTo(curr_pose);
       Pose2d measured = new Pose2d(this.noteDetector.getNoteFieldRelativePose(), new Rotation2d()).relativeTo(curr_pose);
 
-      return (Intake.getInstance().inIntake() || this.noteDetector.notePresent()) && (almost_equal(ideal, measured));
+      return (intake_subsystem.inIntake() || this.noteDetector.notePresent()) && (almost_equal(ideal, measured));
     }
 
     @Override
