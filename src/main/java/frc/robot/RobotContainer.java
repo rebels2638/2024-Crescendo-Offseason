@@ -1,22 +1,38 @@
 package frc.robot;
 
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.AutoRunner;
+import frc.robot.commands.autoAligment.DriveToPose;
 import frc.robot.commands.compositions.CancelIntakeNote;
 import frc.robot.commands.compositions.FeedAndHoldNote;
 import frc.robot.commands.compositions.IntakeNote;
-import frc.robot.commands.compositions.DriveToNote;
+import frc.robot.commands.compositions.IntakeNoteAuto;
 import frc.robot.commands.compositions.ScoreAMP;
+import frc.robot.commands.compositions.ShootNote;
+import frc.robot.commands.compositions.ShootNoteAuto;
 import frc.robot.commands.compositions.ShootNoteTele;
 import frc.robot.commands.drivetrain.AbsoluteFieldDrive;
+import frc.robot.commands.elevator.MoveElevatorAMP;
 import frc.robot.commands.elevator.MoveElevatorToggle;
+import frc.robot.commands.elevator.MoveElevatorTurtle;
+import frc.robot.commands.intake.InIntake;
 import frc.robot.commands.intake.RollIntakeEject;
 import frc.robot.commands.intake.RollIntakeIn;
+import frc.robot.commands.intake.StopIntake;
+import frc.robot.commands.pivot.PivotToTorus;
 import frc.robot.commands.shooterComp.ShooterStop;
+import frc.robot.commands.shooterComp.ShooterWindReverse;
 import frc.robot.commands.shooterComp.ShooterWindup;
 import frc.robot.commands.shooterComp.ShooterWindupLob;
 import frc.robot.lib.input.XboxController;
@@ -114,6 +130,28 @@ public class RobotContainer {
     () -> -MathUtil.applyDeadband(xboxDriver.getLeftX(), Constants.OperatorConstants.LEFT_X_DEADBAND),
     () -> -MathUtil.applyDeadband(xboxDriver.getRightX(), Constants.OperatorConstants.RIGHT_X_DEADBAND)));
 
+    NamedCommands.registerCommand("MoveElevatorAMP", new MoveElevatorAMP());
+    NamedCommands.registerCommand("MoveElevatorTurtle", new MoveElevatorTurtle());
+    NamedCommands.registerCommand("ShooterWindUp", new ShooterWindup());
+    NamedCommands.registerCommand("RollIntakeIn", new RollIntakeIn());
+    NamedCommands.registerCommand("RollIntakeEject", new RollIntakeEject());
+    NamedCommands.registerCommand("StopIntake", new StopIntake());
+    NamedCommands.registerCommand("IntakeNote", new IntakeNote(swerveDrive, intake, noteDetector));
+    NamedCommands.registerCommand("ShooterStop", new ShooterStop());
+    NamedCommands.registerCommand("ShooterWindReverse", new ShooterWindReverse());
+    NamedCommands.registerCommand("ShootNote", new ShootNote());
+    NamedCommands.registerCommand("ShootNoteAuto", new ShootNoteAuto());
+    NamedCommands.registerCommand("PivotToTorus", new PivotToTorus());
+    NamedCommands.registerCommand("CancelIntakeNote", new CancelIntakeNote(null, null, swerveDrive));
+    NamedCommands.registerCommand("RollIntakeIn", new RollIntakeIn());
+    NamedCommands.registerCommand("LobNoteAuto", new SequentialCommandGroup(
+                                                        new ParallelCommandGroup(new WaitCommand(0.4), new ShooterWindup(30)),
+                                                        new RollIntakeIn(),
+                                                        new StopIntake(),
+                                                        new ShooterStop()));
+    NamedCommands.registerCommand("VariableShoot", new InstantCommand(() -> Shooter.getInstance().setVelocityRadSec(0, true, 65, 17.5)));
+    NamedCommands.registerCommand("InIntake", new InIntake());
+
 
     // OP Controlls
     SequentialCommandGroup intakeG, feedHold;
@@ -138,7 +176,9 @@ public class RobotContainer {
     this.xboxDriver.getYButton().onTrue(new InstantCommand(()-> Pivot.getInstance().TorusAngleReset()));
 
     // SYSID STUFF
-    xboxTester.getAButton().whileTrue(swerveDrive.sysIDriveQuasistatic(Direction.kForward));
+    // xboxTester.getAButton().whileTrue(swerveDrive.sysIDriveQuasistatic(Direction.kForward));
+    xboxTester.getAButton().whileTrue(new DriveToPose(new Pose2d(new Translation2d(7.11, 6.48), new Rotation2d(Math.toRadians(161.27)))));
+
     xboxTester.getBButton().whileTrue(swerveDrive.sysIDriveQuasistatic(Direction.kReverse));
     xboxTester.getXButton().whileTrue(swerveDrive.sysIdDriveDynamic(Direction.kForward));
     xboxTester.getYButton().whileTrue(swerveDrive.sysIdDriveDynamic(Direction.kReverse));

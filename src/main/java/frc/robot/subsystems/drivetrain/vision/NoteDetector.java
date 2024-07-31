@@ -82,6 +82,21 @@ public class NoteDetector extends SubsystemBase {
         
         absoluteTranslation2d = swerveDrive.getPose().getTranslation().minus(absoluteTranslation2d);
         prevSample = absoluteTranslation2d;
+
+        // TODO: Fixed sim :skull:
+        if (Constants.currentMode == Constants.Mode.SIM) {
+            Translation3d closestNote = new Translation3d();
+            double minDist = Double.MAX_VALUE;
+            for (int i = 0; i < Constants.FieldConstants.kNOTE_ARR.length; i++) {
+                double dist = cameraPose.getTranslation().getDistance(Constants.FieldConstants.kNOTE_ARR[i]);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closestNote = Constants.FieldConstants.kNOTE_ARR[i];
+                }
+            }
+            return closestNote.toTranslation2d();
+        }
+
         return absoluteTranslation2d;
     }
 

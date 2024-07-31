@@ -232,13 +232,13 @@ public class SwerveDrive extends SubsystemBase {
         Logger.recordOutput("SwerveDrive/estimatedVyDriftMetersPerSecond", estimatedVyDriftMetersPerSecond);
 
         ChassisSpeeds correctedSpeeds = desiredFieldRelativeSpeeds;
-        correctedSpeeds.vxMetersPerSecond = correctedSpeeds.vxMetersPerSecond + estimatedVxDriftMetersPerSecond /*+ 
+        correctedSpeeds.vxMetersPerSecond = correctedSpeeds.vxMetersPerSecond + estimatedVxDriftMetersPerSecond /* + 
                                             m_translationalFeedbackController.calculate(measuredFieldRelativeSpeeds.vxMetersPerSecond, 
                                             desiredFieldRelativeSpeeds.vxMetersPerSecond)*/;
         correctedSpeeds.vyMetersPerSecond = correctedSpeeds.vyMetersPerSecond - estimatedVyDriftMetersPerSecond /*+ 
                                             m_translationalFeedbackController.calculate(measuredFieldRelativeSpeeds.vyMetersPerSecond, 
                                             desiredFieldRelativeSpeeds.vyMetersPerSecond)*/;
-        correctedSpeeds.omegaRadiansPerSecond = correctedSpeeds.omegaRadiansPerSecond/* + m_angleFeedbackController.calculate(measuredFieldRelativeSpeeds.omegaRadiansPerSecond, desiredFieldRelativeSpeeds.omegaRadiansPerSecond)*/;
+        correctedSpeeds.omegaRadiansPerSecond = correctedSpeeds.omegaRadiansPerSecond /* + m_angleFeedbackController.calculate(measuredFieldRelativeSpeeds.omegaRadiansPerSecond, desiredFieldRelativeSpeeds.omegaRadiansPerSecond)*/;
         correctedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(correctedSpeeds, yaw);
 
         Logger.recordOutput("SwerveDrive/correctedSpeeds", correctedSpeeds);
