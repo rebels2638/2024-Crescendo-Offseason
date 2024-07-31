@@ -71,8 +71,9 @@ public class DriveToNote extends Command {
                                                     Constants.IntakeConstants.KINTAKE_TRANSLATION3D.getZ());
 
         Logger.recordOutput("IntakeNoteCommand/notePresent", noteDetector.notePresent());
-        if (noteDetector.hasTargets()) {
-            Translation2d noteTranslation2d = noteDetector.getNoteFieldRelativePose();
+        Translation2d noteTranslation2d = noteDetector.getNoteFieldRelativePose();
+        if (noteDetector.hasTargets() && noteTranslation2d.getDistance(swerveDrive.getPose().getTranslation()) < 1.2) {
+            
             ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
             desiredSpeeds.vxMetersPerSecond = 
                 m_translationalController.calculate(intakeTranslation3d.getX(), noteTranslation2d.getX());
