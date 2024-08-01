@@ -199,7 +199,7 @@ public class RobotContainer {
   }
   
   public Command getAutonomousCommand() {
-    return autoRunner.getAutonomousCommand();
+    return autoRunner.getAutonomousCommand(swerveDrive, intake, noteDetector);
   }
 
   public String getSelectedAuto() {

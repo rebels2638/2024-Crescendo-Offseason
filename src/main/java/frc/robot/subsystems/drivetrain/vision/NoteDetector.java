@@ -130,14 +130,30 @@ public class NoteDetector extends SubsystemBase {
         return intakeTranslation3d.getDistance(new Translation3d(getNoteFieldRelativePose().getX(), getNoteFieldRelativePose().getY(), 0));
     }
 
-    public boolean notePresent() {
+    private boolean almost_equal(Pose2d a, Pose2d b) {
+        return Math.abs(Math.atan(a.getY()/a.getX())-Math.atan(b.getY()/b.getX())) < Math.toRadians(20) && Math.abs(a.getTranslation().getDistance(b.getTranslation())) <= 1.5; // deg and meter
+    }
+
+    public boolean notePresent(int index) {
         Logger.recordOutput("NoteDetector/intakeDistToNote", intakeDistToNote());
         Logger.recordOutput("NoteDetector/drivetrainDistToNote", getDrivetrainDistToNote());
 
-        return (
-            hasTargets() || 
-            (intakeDistToNote() <= Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_BLIND_SPOT_DISTANCE_METERS && 
-            intakeDistToNote() < getDrivetrainDistToNote())
-        );
+        Pose2d curr_pose = swerveDrive.getPose();
+        Pose2d ideal = new Pose2d(Constants.FieldConstants.kNOTE_ARR[index].toTranslation2d(), new Rotation2d()).relativeTo(curr_pose);
+        Pose2d measured = new Pose2d(getNoteFieldRelativePose(), new Rotation2d()).relativeTo(curr_pose);
+  
+        double rotDelta = Math.abs(-Math.atan2((Constants.FieldConstants.kNOTE_ARR[index].getY() - curr_pose.getTranslation().getY()),  
+        (Constants.FieldConstants.kNOTE_ARR[index].getX() - curr_pose.getTranslation().getX()))) + Math.PI - curr_pose.getRotation().getRadians();
+  
+        Logger.recordOutput("NoteDetector/notePresent/rotDelta", rotDelta);
+  
+        boolean present = 
+          rotDelta >= Math.toRadians(20) ||
+          curr_pose.getTranslation().getDistance(Constants.FieldConstants.kNOTE_ARR[index].toTranslation2d()) >= 1.2 ||
+          (hasTargets() && almost_equal(ideal, measured));
+  
+       
+        Logger.recordOutput("NoteDetector/notePresent", present);
+        return present;
     }
 }

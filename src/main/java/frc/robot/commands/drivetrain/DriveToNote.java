@@ -70,7 +70,6 @@ public class DriveToNote extends Command {
                                                     intakeTranslation2d.getY(), 
                                                     Constants.IntakeConstants.KINTAKE_TRANSLATION3D.getZ());
 
-        Logger.recordOutput("IntakeNoteCommand/notePresent", noteDetector.notePresent());
         Translation2d noteTranslation2d = noteDetector.getNoteFieldRelativePose();
         if (noteDetector.hasTargets()/* &&   noteTranslation2d.getDistance(swerveDrive.getPose().getTranslation()) < 1.2*/) {
             

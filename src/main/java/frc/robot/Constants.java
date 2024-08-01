@@ -107,7 +107,7 @@ public final class Constants {
       new Translation3d(8.28, 4.11, 0),
       new Translation3d(8.28, 2.44, 0),
       new Translation3d(8.28, 0.77, 0),
-      new Translation3d(2.89, 6.98, 0),
+      new Translation3d(-2.89, 6.98, 0),
       new Translation3d(2.89, 5.54, 0),
       new Translation3d(2.89, 4.10, 0),
     };

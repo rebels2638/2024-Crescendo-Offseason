@@ -31,6 +31,10 @@ public class NotePresent extends Command {
 
     @Override
     public boolean isFinished() {
+      if (intake_subsystem.inIntake()) {
+        return true;
+      }
+      
       Pose2d curr_pose = this.swerve_subsystem.getPose();
       Pose2d ideal = new Pose2d(Constants.FieldConstants.kNOTE_ARR[index].toTranslation2d(), new Rotation2d()).relativeTo(curr_pose);
       Pose2d measured = new Pose2d(this.noteDetector.getNoteFieldRelativePose(), new Rotation2d()).relativeTo(curr_pose);
@@ -43,9 +47,9 @@ public class NotePresent extends Command {
       boolean present = 
         rotDelta >= Math.toRadians(20) ||
         curr_pose.getTranslation().getDistance(Constants.FieldConstants.kNOTE_ARR[index].toTranslation2d()) >= 1.2 ||
-        intake_subsystem.inIntake() || 
         (this.noteDetector.hasTargets() && almost_equal(ideal, measured));
 
+     
       Logger.recordOutput("NotePresent", present);
 
       if (useNotPresent) {

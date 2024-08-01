@@ -14,9 +14,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
+import frc.robot.subsystems.drivetrain.vision.NoteDetector;
+import frc.robot.subsystems.intakeComp.Intake;
 
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.ReplanningConfig;
+import frc.robot.commands.Autos;
 
 // acts more like a helper class rather than a subsystem or command.
 public class AutoRunner {
@@ -83,7 +86,7 @@ public class AutoRunner {
     }
 
         
-    public Command getAutonomousCommand() { 
+    public Command getAutonomousCommand(SwerveDrive swerveDrive, Intake intake, NoteDetector noteDetector) { 
         //TODO:!! HERE CHANGE THIS 
         //4PMidMASScoreTurn
         //3PAmpAM << Amp Side 3 piece      
@@ -100,7 +103,8 @@ public class AutoRunner {
         //2.5PAmpA1
         //3PAmpA2 << FAR 2
         pathChosen = "AdaptableTest";
-        return new PathPlannerAuto(pathChosen);
+        // return new PathPlannerAuto(pathChosen);
+        return Autos.adaptableTest(swerveDrive, intake, noteDetector);
     }
 
     public String getSelectedAutoName() {
