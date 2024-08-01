@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import frc.robot.commands.autoAligment.DriveToPose;
 import frc.robot.commands.compositions.IntakeNote;
+import frc.robot.commands.compositions.NotePresent;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
 import frc.robot.subsystems.drivetrain.vision.NoteDetector;
@@ -22,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public final class Autos {
@@ -35,16 +37,22 @@ public final class Autos {
       new InstantCommand(() -> swerveDrive.resetPose(PathPlannerPath.fromPathFile("ToAmpNoteFromAmpShort").getPreviewStartingHolonomicPose())),
       AutoBuilder.followPath(PathPlannerPath.fromPathFile("ToAmpNoteFromAmpShort")),
       new ConditionalCommand(
-        new IntakeNote(swerveDrive, intake, noteDetector),
+        new ParallelRaceGroup(
+              new IntakeNote(swerveDrive, intake, noteDetector),
+              new NotePresent(noteDetector, intake, swerveDrive, 5, false)
+        ),
         new SequentialCommandGroup(
-          new DriveToPose(new Pose2d(new Translation2d(2.62, 6.64), new Rotation2d(Math.toRadians(-75)))),
+          new DriveToPose(new Pose2d(new Translation2d(1.95, 6.44), new Rotation2d(Math.toRadians(123.35)))),
           new ConditionalCommand(
-            new IntakeNote(swerveDrive, intake, noteDetector), 
-            new InstantCommand( () -> {}), 
-            () -> noteDetector.notePresent(5)
+            new ParallelRaceGroup(
+              new IntakeNote(swerveDrive, intake, noteDetector),
+              new NotePresent(noteDetector, intake, swerveDrive, 6, false)
+            ),
+            new InstantCommand(() -> {}), 
+            () -> !noteDetector.checked(6)
           )
         ),
-        () -> noteDetector.notePresent(6)
+        () -> /*!noteDetector.checked(5)*/ false
       ),
       AutoBuilder.followPath(PathPlannerPath.fromPathFile("ToAmpFromAmpNoteShort"))
     );

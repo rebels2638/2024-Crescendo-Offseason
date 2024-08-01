@@ -60,7 +60,7 @@ public class NotePresent extends Command {
 
     @Override
     public void end(boolean interrupted) {
-
+      Logger.recordOutput("NotePresent/interrupted", interrupted);
     }
 }
 

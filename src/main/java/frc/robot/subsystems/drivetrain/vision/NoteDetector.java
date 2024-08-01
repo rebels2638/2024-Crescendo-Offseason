@@ -22,6 +22,17 @@ public class NoteDetector extends SubsystemBase {
 
     private Translation2d prevSample = new Translation2d();
 
+    private boolean[] checked = new boolean[] {
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false
+    };
+
     public NoteDetector(SwerveDrive swerveDrive) {
         this.swerveDrive = swerveDrive;
         switch(Constants.currentMode) {
@@ -142,18 +153,24 @@ public class NoteDetector extends SubsystemBase {
         Pose2d ideal = new Pose2d(Constants.FieldConstants.kNOTE_ARR[index].toTranslation2d(), new Rotation2d()).relativeTo(curr_pose);
         Pose2d measured = new Pose2d(getNoteFieldRelativePose(), new Rotation2d()).relativeTo(curr_pose);
   
-        double rotDelta = Math.abs(-Math.atan2((Constants.FieldConstants.kNOTE_ARR[index].getY() - curr_pose.getTranslation().getY()),  
-        (Constants.FieldConstants.kNOTE_ARR[index].getX() - curr_pose.getTranslation().getX()))) + Math.PI - curr_pose.getRotation().getRadians();
+        double rotDelta = Math.abs(Math.atan2((Constants.FieldConstants.kNOTE_ARR[index].getY() - curr_pose.getTranslation().getY()),  
+        (Constants.FieldConstants.kNOTE_ARR[index].getX() - curr_pose.getTranslation().getX()))) + curr_pose.getRotation().getRadians();
   
         Logger.recordOutput("NoteDetector/notePresent/rotDelta", rotDelta);
   
         boolean present = 
-          rotDelta >= Math.toRadians(20) ||
-          curr_pose.getTranslation().getDistance(Constants.FieldConstants.kNOTE_ARR[index].toTranslation2d()) >= 1.2 ||
+          (rotDelta >= Math.toRadians(20) &&
+          curr_pose.getTranslation().getDistance(Constants.FieldConstants.kNOTE_ARR[index].toTranslation2d()) >= 2) ||
           (hasTargets() && almost_equal(ideal, measured));
   
        
         Logger.recordOutput("NoteDetector/notePresent", present);
+        
+        checked[index] = true;
         return present;
+    }
+
+    public boolean checked(int index) {
+        return checked[index];
     }
 }

@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.4633455869167922,
-        "y": 7.178814370365265
+        "x": 1.4633223710894683,
+        "y": 7.178799091921299
       },
       "isLocked": false,
       "linkedName": "ToMidNoteShort"
@@ -20,8 +20,8 @@
         "y": 6.7
       },
       "prevControl": {
-        "x": 0.9165034796636122,
-        "y": 6.925823671516327
+        "x": 0.916492009723599,
+        "y": 6.925834667510113
       },
       "nextControl": null,
       "isLocked": false,

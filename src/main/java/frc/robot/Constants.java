@@ -53,7 +53,7 @@ public final class Constants {
   {
 
     public static final PIDConstants TRANSLATION_PID_CONFIG = new PIDConstants(3, 0, 0.0000);
-    public static final PIDConstants ANGLE_PID_CONFIG = new PIDConstants(1.2, 0, 0.0); 
+    public static final PIDConstants ANGLE_PID_CONFIG = new PIDConstants(2, 0, 0.0); 
 
     public static final double MAX_SPEED = 4;
     public static final double MAX_ACCELERATION = 2;
@@ -107,7 +107,7 @@ public final class Constants {
       new Translation3d(8.28, 4.11, 0),
       new Translation3d(8.28, 2.44, 0),
       new Translation3d(8.28, 0.77, 0),
-      new Translation3d(-2.89, 6.98, 0),
+      new Translation3d(2.89, 6.98, 0),
       new Translation3d(2.89, 5.54, 0),
       new Translation3d(2.89, 4.10, 0),
     };
@@ -120,7 +120,7 @@ public final class Constants {
     //   new Pose3d(new Translation3d(-0.15, -0.47,  0.7), new Rotation3d(Math.toRadians(0), Math.toRadians(30), Math.toRadians(5)));
     
     public static final Pose3d kNOTE_DETECTOR_CAMERA_POSE = // SIM
-      new Pose3d(new Translation3d(-0.15, -0.47,  0.7), new Rotation3d(Math.toRadians(0), Math.toRadians(30), Math.toRadians(90 + (90-27))));
+      new Pose3d(new Translation3d(-0.15, -0.47,  0.7), new Rotation3d(Math.toRadians(0), Math.toRadians(25), Math.toRadians(-30 - 12 + 180)));
     public static final double kNOTE_DETECTOR_CAMERA_FOV_X_RAD = Math.toRadians(29.8 * 2);
     public static final double kNOTE_DETECTOR_CAMERA_FOV_Y_RAD = Math.toRadians(24.85 * 2);
     public static final double kNOTE_DETECTOR_CAMERA_MAX_RANGE_METERS = 2;
