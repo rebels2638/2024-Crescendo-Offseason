@@ -72,7 +72,7 @@ public class DriveToNote extends Command {
 
         Logger.recordOutput("IntakeNoteCommand/notePresent", noteDetector.notePresent());
         Translation2d noteTranslation2d = noteDetector.getNoteFieldRelativePose();
-        if (noteDetector.hasTargets() && noteTranslation2d.getDistance(swerveDrive.getPose().getTranslation()) < 1.2) {
+        if (noteDetector.hasTargets()/* &&   noteTranslation2d.getDistance(swerveDrive.getPose().getTranslation()) < 1.2*/) {
             
             ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
             desiredSpeeds.vxMetersPerSecond = 
@@ -80,14 +80,14 @@ public class DriveToNote extends Command {
             desiredSpeeds.vyMetersPerSecond = 
                 m_translationalController.calculate(intakeTranslation3d.getY(), noteTranslation2d.getY());
 
-            double desiredRotation = Math.atan2(
+            double desiredRotation = -Math.atan2(
                         swerveDrive.getPose().getY() - noteTranslation2d.getY(), 
-                        swerveDrive.getPose().getX() - noteTranslation2d.getX());
+                        swerveDrive.getPose().getX() - noteTranslation2d.getX()) + Math.PI;
 
             initialYaw = new Rotation2d(desiredRotation);
 
             desiredSpeeds.omegaRadiansPerSecond = 
-                m_rotationalController.calculate(
+                -m_rotationalController.calculate(
                     robotYaw.getRadians(), desiredRotation);
 
             

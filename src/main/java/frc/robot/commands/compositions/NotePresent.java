@@ -26,7 +26,7 @@ public class NotePresent extends Command {
     }
 
     private boolean almost_equal(Pose2d a, Pose2d b) {
-      return Math.abs(Math.atan(a.getY()/a.getX())-Math.atan(b.getY()/b.getX())) < 10 && Math.abs(a.getTranslation().getDistance(b.getTranslation())) < 1.5; // deg and meter
+      return Math.abs(Math.atan(a.getY()/a.getX())-Math.atan(b.getY()/b.getX())) < Math.toRadians(20) && Math.abs(a.getTranslation().getDistance(b.getTranslation())) <= 1.5; // deg and meter
     }
 
     @Override
@@ -41,7 +41,7 @@ public class NotePresent extends Command {
       Logger.recordOutput("NotePresent/rotDelta", rotDelta);
 
       boolean present = 
-        rotDelta >= 20 ||
+        rotDelta >= Math.toRadians(20) ||
         curr_pose.getTranslation().getDistance(Constants.FieldConstants.kNOTE_ARR[index].toTranslation2d()) >= 1.2 ||
         (intake_subsystem.inIntake() || this.noteDetector.notePresent()) && (almost_equal(ideal, measured));
 
