@@ -32,10 +32,19 @@ public class NotePresent extends Command {
     @Override
     public boolean isFinished() {
       Pose2d curr_pose = this.swerve_subsystem.getPose();
-      Pose2d ideal = new Pose2d(Constants.FieldConstants.kNOTE_ARR[index].getX(), Constants.FieldConstants.kNOTE_ARR[index].getY(), new Rotation2d()).relativeTo(curr_pose);
+      Pose2d ideal = new Pose2d(Constants.FieldConstants.kNOTE_ARR[index].toTranslation2d(), new Rotation2d()).relativeTo(curr_pose);
       Pose2d measured = new Pose2d(this.noteDetector.getNoteFieldRelativePose(), new Rotation2d()).relativeTo(curr_pose);
 
-      boolean present = (intake_subsystem.inIntake() || this.noteDetector.notePresent()) && (almost_equal(ideal, measured));
+      double rotDelta = Math.abs(-Math.atan2((Constants.FieldConstants.kNOTE_ARR[index].getY() - curr_pose.getTranslation().getY()),  
+      (Constants.FieldConstants.kNOTE_ARR[index].getX() - curr_pose.getTranslation().getX()))) + Math.PI - curr_pose.getRotation().getRadians();
+
+      Logger.recordOutput("NotePresent/rotDelta", rotDelta);
+
+      boolean present = 
+        rotDelta >= 20 ||
+        curr_pose.getTranslation().getDistance(Constants.FieldConstants.kNOTE_ARR[index].toTranslation2d()) >= 1.2 ||
+        (intake_subsystem.inIntake() || this.noteDetector.notePresent()) && (almost_equal(ideal, measured));
+
       Logger.recordOutput("NotePresent", present);
 
       if (useNotPresent) {
