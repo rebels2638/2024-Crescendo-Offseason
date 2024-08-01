@@ -130,7 +130,7 @@ public final class Constants {
 
   public static class IntakeConstants {
     public static final double kROLLER_RADIUS_METERS = 0.025;
-    public static final Translation3d KINTAKE_TRANSLATION3D = new Translation3d(.38, 0, 0);
+    public static final Translation3d KINTAKE_TRANSLATION3D = new Translation3d(-.38, 0, 0);
   }
 
 }

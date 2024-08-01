@@ -93,6 +93,12 @@
               }
             ]
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ToAmpFromAmpNoteShort"
+          }
         }
       ]
     }

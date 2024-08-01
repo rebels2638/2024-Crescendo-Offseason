@@ -34,7 +34,7 @@ public class DriveToNote extends Command {
         switch (Constants.currentMode) {
             case SIM:
                 m_translationalController = new PIDController(1.2, 0, 0);
-                m_rotationalController = new ProfiledPIDController(1.2, 0, 0,
+                m_rotationalController = new ProfiledPIDController(1, 0, 0,
                  new Constraints(Constants.Auton.MAX_ANGULAR_VELO_RPS * 2 * Math.PI, 
                  Constants.Auton.MAX_ANGULAR_ACCEL_RPS_SQUARED * 2 * Math.PI));
                 break;
@@ -80,9 +80,9 @@ public class DriveToNote extends Command {
             desiredSpeeds.vyMetersPerSecond = 
                 m_translationalController.calculate(intakeTranslation3d.getY(), noteTranslation2d.getY());
 
-            double desiredRotation = -Math.atan2(
+            double desiredRotation = Math.atan2(
                         swerveDrive.getPose().getY() - noteTranslation2d.getY(), 
-                        swerveDrive.getPose().getX() - noteTranslation2d.getX()) + Math.PI;
+                        swerveDrive.getPose().getX() - noteTranslation2d.getX());
 
             initialYaw = new Rotation2d(desiredRotation);
 
@@ -139,6 +139,7 @@ public class DriveToNote extends Command {
     public void end(boolean interrupted) {
         Logger.recordOutput("IntakeNoteCommand/driveInterrupted", interrupted);
         Logger.recordOutput("IntakeNoteCommand/end", true);
+        swerveDrive.driveFieldRelative(new ChassisSpeeds(0, 0, 0));
     }
 }
 

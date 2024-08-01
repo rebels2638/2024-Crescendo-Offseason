@@ -43,7 +43,8 @@ public class NotePresent extends Command {
       boolean present = 
         rotDelta >= Math.toRadians(20) ||
         curr_pose.getTranslation().getDistance(Constants.FieldConstants.kNOTE_ARR[index].toTranslation2d()) >= 1.2 ||
-        (intake_subsystem.inIntake() || this.noteDetector.notePresent()) && (almost_equal(ideal, measured));
+        intake_subsystem.inIntake() || 
+        (this.noteDetector.hasTargets() && almost_equal(ideal, measured));
 
       Logger.recordOutput("NotePresent", present);
 

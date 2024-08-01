@@ -47,14 +47,14 @@ public class IndexerIOSim implements IndexerIO {
         double dist = Double.MAX_VALUE;
         dist = noteDetector.getNoteFieldRelativePose().getDistance(intakeTranslation3d.toTranslation2d());
 
-        if (dist <= .1 && !contact && intake.getVelocityMps() >= .2 && pivot.getDegAngle() >= 60) {
+        if (dist <= .15 && !contact && intake.getVelocityMps() >= .2 && pivot.getDegAngle() >= 60) {
             contact = true;
             initialIntakePose = intake.getPoseMeters();
         }
-        if (contact && intake.getPoseMeters() < initialIntakePose) {
-            contact = false;
-            inputs.inIntake = false;
-        }
+        // if (contact && intake.getPoseMeters() < initialIntakePose) {
+        //     contact = false;
+        //     inputs.inIntake = false;
+        // }
         if (contact && intake.getPoseMeters() - initialIntakePose >= Constants.FieldConstants.kNOTE_DIAMETER_METERS) {
             inputs.inIntake = true;
         }
