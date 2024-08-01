@@ -286,8 +286,9 @@ public class SwerveDrive extends SubsystemBase {
         //     pose = GeometryUtil.flipFieldPose(pose);
         // } 
 
+        zeroGyro();
         m_poseEstimator.resetPosition(pose.getRotation(), positions, pose);
-        gyroIO.reset(new Rotation3d(0,0, pose.getRotation().getRadians() - m_poseEstimator.getEstimatedPosition().getRotation().getRadians()));
+        gyroIO.reset(new Rotation3d(0,0, pose.getRotation().getRadians()));
         yaw = pose.getRotation();
         odometryLock.unlock();
     }

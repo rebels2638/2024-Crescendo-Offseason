@@ -125,11 +125,6 @@ public class RobotContainer {
 
 
     autoRunner = new AutoRunner(swerveDrive);
-    
-    swerveDrive.setDefaultCommand(new AbsoluteFieldDrive(swerveDrive, 
-    () -> -MathUtil.applyDeadband(xboxDriver.getLeftY(), Constants.OperatorConstants.LEFT_Y_DEADBAND),
-    () -> -MathUtil.applyDeadband(xboxDriver.getLeftX(), Constants.OperatorConstants.LEFT_X_DEADBAND),
-    () -> -MathUtil.applyDeadband(xboxDriver.getRightX(), Constants.OperatorConstants.RIGHT_X_DEADBAND)));
 
     NamedCommands.registerCommand("MoveElevatorAMP", new MoveElevatorAMP());
     NamedCommands.registerCommand("MoveElevatorTurtle", new MoveElevatorTurtle());
@@ -162,6 +157,11 @@ public class RobotContainer {
     // OP Controlls
     SequentialCommandGroup intakeG, feedHold;
     intakeG = null;
+    swerveDrive.setDefaultCommand(new AbsoluteFieldDrive(swerveDrive, 
+    () -> -MathUtil.applyDeadband(xboxDriver.getLeftY(), Constants.OperatorConstants.LEFT_Y_DEADBAND),
+    () -> -MathUtil.applyDeadband(xboxDriver.getLeftX(), Constants.OperatorConstants.LEFT_X_DEADBAND),
+    () -> -MathUtil.applyDeadband(xboxDriver.getRightX(), Constants.OperatorConstants.RIGHT_X_DEADBAND)));
+    
     this.xboxOperator.getRightBumper().onTrue(new ShooterWindup());
     this.xboxOperator.getXButton().onTrue(new MoveElevatorToggle());
     this.xboxOperator.getYButton().onTrue(new ScoreAMP()); // changed
@@ -206,5 +206,10 @@ public class RobotContainer {
     return autoRunner.getSelectedAutoName();
   }
 
+  public void offsetAngle() {
+    swerveDrive.resetPose(new Pose2d(
+      swerveDrive.getPose().getTranslation(), 
+      swerveDrive.getPose().getRotation().plus(new Rotation2d(Math.PI / 2))));
+  }
 }
 

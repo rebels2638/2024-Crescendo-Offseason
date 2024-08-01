@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
@@ -33,8 +32,10 @@ public final class Autos {
   }
 
   public static Command adaptableTest(SwerveDrive swerveDrive, Intake intake, NoteDetector noteDetector) {
+    Pose2d p = PathPlannerPath.fromPathFile("ToAmpNoteFromAmpShort").getPreviewStartingHolonomicPose();
     return new SequentialCommandGroup(
-      new InstantCommand(() -> swerveDrive.resetPose(PathPlannerPath.fromPathFile("ToAmpNoteFromAmpShort").getPreviewStartingHolonomicPose())),
+      new InstantCommand(() -> swerveDrive.resetPose(new Pose2d(p.getTranslation(), new Rotation2d(p.getRotation().unaryMinus().getRadians()+Math.PI/2)))),
+      // new InstantCommand(() -> System.out.println(new Rotation2d(p.getRotation().unaryMinus().getRadians()+Math.PI/2).getDegrees())),
       AutoBuilder.followPath(PathPlannerPath.fromPathFile("ToAmpNoteFromAmpShort")),
       new ConditionalCommand(
         new ParallelRaceGroup(
@@ -42,7 +43,7 @@ public final class Autos {
               new NotePresent(noteDetector, intake, swerveDrive, 5, false)
         ),
         new SequentialCommandGroup(
-          new DriveToPose(new Pose2d(new Translation2d(1.95, 6.44), new Rotation2d(Math.toRadians(123.35)))),
+          new DriveToPose(new Pose2d(new Translation2d(1.99, 5), new Rotation2d(Math.toRadians(145)))),
           new ConditionalCommand(
             new ParallelRaceGroup(
               new IntakeNote(swerveDrive, intake, noteDetector),
