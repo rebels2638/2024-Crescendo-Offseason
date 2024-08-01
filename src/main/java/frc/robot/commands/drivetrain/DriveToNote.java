@@ -139,8 +139,6 @@ public class DriveToNote extends Command {
     public void end(boolean interrupted) {
         Logger.recordOutput("IntakeNoteCommand/driveInterrupted", interrupted);
         Logger.recordOutput("IntakeNoteCommand/end", true);
-
-        swerveDrive.driveFieldRelative(new ChassisSpeeds(0, 0, 0));
     }
 }
 

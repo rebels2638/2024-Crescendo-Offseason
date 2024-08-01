@@ -6,6 +6,8 @@ import java.util.function.Consumer;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.util.GeometryUtil;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -18,6 +20,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Voltage;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
@@ -278,13 +281,19 @@ public class SwerveDrive extends SubsystemBase {
             positions[i] = new SwerveModulePosition(0.0, new Rotation2d(moduleInputs[i].anglePositionRad));
         }
 
-        gyroIO.reset(new Rotation3d(0,0, pose.getRotation().getRadians()));
+        // var alliance = DriverStation.getAlliance();
+        // if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+        //     pose = GeometryUtil.flipFieldPose(pose);
+        // } 
+
         m_poseEstimator.resetPosition(pose.getRotation(), positions, pose);
+        gyroIO.reset(new Rotation3d(0,0, pose.getRotation().getRadians() - m_poseEstimator.getEstimatedPosition().getRotation().getRadians()));
         odometryLock.unlock();
     }
 
     public void zeroGyro() {
         gyroIO.zero();
+        gyroIO.setOffset(new Rotation3d());
     }
 
     public ChassisSpeeds getMeasuredRobotRelativeSpeeds() {

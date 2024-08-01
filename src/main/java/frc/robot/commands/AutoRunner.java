@@ -99,7 +99,7 @@ public class AutoRunner {
         //4PMidMASScoreTrans
         //2.5PAmpA1
         //3PAmpA2 << FAR 2
-        pathChosen = "4PMidMASScoreTrans";
+        pathChosen = "AdaptableTest";
         return new PathPlannerAuto(pathChosen);
     }
 

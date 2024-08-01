@@ -2,11 +2,15 @@ package frc.robot.subsystems.drivetrain.vision;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.util.GeometryUtil;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
@@ -85,16 +89,24 @@ public class NoteDetector extends SubsystemBase {
 
         // TODO: Fixed sim :skull:
         if (Constants.currentMode == Constants.Mode.SIM) {
-            Translation3d closestNote = new Translation3d();
+            Translation2d closestNote = new Translation2d();
             double minDist = Double.MAX_VALUE;
             for (int i = 0; i < Constants.FieldConstants.kNOTE_ARR.length; i++) {
-                double dist = cameraPose.getTranslation().getDistance(Constants.FieldConstants.kNOTE_ARR[i]);
+
+                var alliance = DriverStation.getAlliance();
+                Pose2d notePose = new Pose2d(Constants.FieldConstants.kNOTE_ARR[i].toTranslation2d(), new Rotation2d());
+                // if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+                //     notePose = GeometryUtil.flipFieldPose(notePose);
+                // } 
+
+                double dist = cameraPose.getTranslation().toTranslation2d().getDistance(notePose.getTranslation());
                 if (dist < minDist) {
                     minDist = dist;
-                    closestNote = Constants.FieldConstants.kNOTE_ARR[i];
+                    closestNote = notePose.getTranslation();
                 }
             }
-            return closestNote.toTranslation2d();
+
+            return closestNote;
         }
 
         return absoluteTranslation2d;

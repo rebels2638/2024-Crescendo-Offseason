@@ -169,5 +169,6 @@ public class ModuleIOTalon implements ModuleIO {
     @Override
     public void resetPosition() {
         drivePositionsMeters = 0;
+        m_drive.setPosition(0);
     }
 }

@@ -18,6 +18,7 @@ import frc.robot.commands.compositions.CancelIntakeNote;
 import frc.robot.commands.compositions.FeedAndHoldNote;
 import frc.robot.commands.compositions.IntakeNote;
 import frc.robot.commands.compositions.IntakeNoteAuto;
+import frc.robot.commands.compositions.NotePresent;
 import frc.robot.commands.compositions.ScoreAMP;
 import frc.robot.commands.compositions.ShootNote;
 import frc.robot.commands.compositions.ShootNoteAuto;
@@ -151,6 +152,11 @@ public class RobotContainer {
                                                         new ShooterStop()));
     NamedCommands.registerCommand("VariableShoot", new InstantCommand(() -> Shooter.getInstance().setVelocityRadSec(0, true, 65, 17.5)));
     NamedCommands.registerCommand("InIntake", new InIntake());
+    NamedCommands.registerCommand("AmpNotePresent", new NotePresent(noteDetector, intake, swerveDrive, 5, false));
+    NamedCommands.registerCommand("MidNotePresent", new NotePresent(noteDetector, intake, swerveDrive, 6, false));
+    NamedCommands.registerCommand("AmpNoteNotPresent", new NotePresent(noteDetector, intake, swerveDrive, 5, true));
+
+    NamedCommands.registerCommand("DriveToMidNoteFromAmp", new DriveToPose(new Pose2d(new Translation2d(2.62, 6.64), new Rotation2d(Math.toRadians(-75)))));
 
 
     // OP Controlls

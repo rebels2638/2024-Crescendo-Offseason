@@ -52,7 +52,7 @@ public final class Constants {
   public static final class Auton
   {
 
-    public static final PIDConstants TRANSLATION_PID_CONFIG = new PIDConstants(1, 0, 0.0000);
+    public static final PIDConstants TRANSLATION_PID_CONFIG = new PIDConstants(3, 0, 0.0000);
     public static final PIDConstants ANGLE_PID_CONFIG = new PIDConstants(1.2, 0, 0.0); 
 
     public static final double MAX_SPEED = 4;
@@ -100,6 +100,7 @@ public final class Constants {
 
   public static class FieldConstants {
     // mid 1, 2, 3, 4, 5 (top to bottom), ampside, mid, source
+    // THIS IS FROM BLUE ORIGIN
     public static final Translation3d[] kNOTE_ARR = new Translation3d[] {
       new Translation3d(8.28, 7.44, 0),
       new Translation3d(8.28, 5.78, 0),
