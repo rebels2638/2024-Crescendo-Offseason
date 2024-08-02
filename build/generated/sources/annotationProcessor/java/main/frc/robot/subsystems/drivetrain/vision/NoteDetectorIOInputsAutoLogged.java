@@ -11,6 +11,7 @@ public class NoteDetectorIOInputsAutoLogged extends NoteDetectorIO.NoteDetectorI
     table.put("TxRadians", txRadians);
     table.put("TyRadians", tyRadians);
     table.put("HasTargets", hasTargets);
+    table.put("BestNote", bestNote);
   }
 
   @Override
@@ -18,6 +19,7 @@ public class NoteDetectorIOInputsAutoLogged extends NoteDetectorIO.NoteDetectorI
     txRadians = table.get("TxRadians", txRadians);
     tyRadians = table.get("TyRadians", tyRadians);
     hasTargets = table.get("HasTargets", hasTargets);
+    bestNote = table.get("BestNote", bestNote);
   }
 
   public NoteDetectorIOInputsAutoLogged clone() {
@@ -25,6 +27,7 @@ public class NoteDetectorIOInputsAutoLogged extends NoteDetectorIO.NoteDetectorI
     copy.txRadians = this.txRadians;
     copy.tyRadians = this.tyRadians;
     copy.hasTargets = this.hasTargets;
+    copy.bestNote = this.bestNote;
     return copy;
   }
 }

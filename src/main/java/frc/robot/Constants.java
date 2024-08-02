@@ -22,7 +22,7 @@ import edu.wpi.first.math.geometry.Translation3d;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final Mode currentMode = Mode.REAL; // TODO: change this if sim
+  public static final Mode currentMode = Mode.SIM; // TODO: change this if sim
   // public static final boolean isSYSID = true; // TODO: change this if sysid
   public static enum Mode {
     /** Running on a real robot. */
@@ -52,10 +52,10 @@ public final class Constants {
   public static final class Auton
   {
 
-    public static final PIDConstants TRANSLATION_PID_CONFIG = new PIDConstants(3, 0, 0.0000);
+    public static final PIDConstants TRANSLATION_PID_CONFIG = new PIDConstants(1, 0, 0.0000);
     public static final PIDConstants ANGLE_PID_CONFIG = new PIDConstants(1, 0, 0.0); 
 
-    public static final double MAX_SPEED = 2;
+    public static final double MAX_SPEED = 4;
     public static final double MAX_ACCELERATION = 2;
     public static final double MAX_ANGULAR_VELO_RPS = 2; // 1
     public static final double MAX_ANGULAR_ACCEL_RPS_SQUARED = 1; // 0.5
@@ -72,7 +72,7 @@ public final class Constants {
   }
 
   public static class DrivetrainConstants {
-    public static final double kMAX_SPEED_METERS_PER_SECOND = 2;
+    public static final double kMAX_SPEED_METERS_PER_SECOND = 4;
     public static final double kMAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2;
     public static final double kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
     public static final double kMAX_ANGULAR_ACCELERATION_RADIANS_PER_SECOND_SQUARED = 2 * Math.PI;
@@ -116,11 +116,11 @@ public final class Constants {
   }
 
   public static class VisionConstants {
-    public static final Pose3d kNOTE_DETECTOR_CAMERA_POSE = // REAL
-      new Pose3d(new Translation3d(-0.15, -0.47,  0.7), new Rotation3d(Math.toRadians(0), Math.toRadians(30), Math.toRadians(5)));
+    // public static final Pose3d kNOTE_DETECTOR_CAMERA_POSE = // REAL
+    //   new Pose3d(new Translation3d(-0.15, -0.47,  0.7), new Rotation3d(Math.toRadians(0), Math.toRadians(30), Math.toRadians(5)));
     
-    // public static final Pose3d kNOTE_DETECTOR_CAMERA_POSE = // SIM
-    //   new Pose3d(new Translation3d(-0.15, -0.47,  0.7), new Rotation3d(Math.toRadians(0), Math.toRadians(25), Math.toRadians(-30 - 12 + 180)));
+    public static final Pose3d kNOTE_DETECTOR_CAMERA_POSE = // SIM
+      new Pose3d(new Translation3d(-0.15, -0.47,  0.7), new Rotation3d(Math.toRadians(0), Math.toRadians(25), Math.toRadians(150)));
     public static final double kNOTE_DETECTOR_CAMERA_FOV_X_RAD = Math.toRadians(29.8 * 2);
     public static final double kNOTE_DETECTOR_CAMERA_FOV_Y_RAD = Math.toRadians(24.85 * 2);
     public static final double kNOTE_DETECTOR_CAMERA_MAX_RANGE_METERS = 2;

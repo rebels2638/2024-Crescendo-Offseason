@@ -1,4 +1,4 @@
-package frc.robot.commands.compositions;
+package frc.robot.commands.autoAligment;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -30,11 +30,7 @@ public class NotePresent extends Command {
     }
 
     @Override
-    public boolean isFinished() {
-      if (intake_subsystem.inIntake()) {
-        return true;
-      }
-      
+    public boolean isFinished() {  
       Pose2d curr_pose = this.swerve_subsystem.getPose();
       Pose2d ideal = new Pose2d(Constants.FieldConstants.kNOTE_ARR[index].toTranslation2d(), new Rotation2d()).relativeTo(curr_pose);
       Pose2d measured = new Pose2d(this.noteDetector.getNoteFieldRelativePose(), new Rotation2d()).relativeTo(curr_pose);
@@ -44,13 +40,24 @@ public class NotePresent extends Command {
 
       Logger.recordOutput("NotePresent/rotDelta", rotDelta);
 
+      double dist = curr_pose.getTranslation().getDistance(Constants.FieldConstants.kNOTE_ARR[index].toTranslation2d());
+      Logger.recordOutput("NotePresent/dist", dist);
+      
       boolean present = 
         rotDelta >= Math.toRadians(20) ||
-        curr_pose.getTranslation().getDistance(Constants.FieldConstants.kNOTE_ARR[index].toTranslation2d()) >= 1.2 ||
+        dist >= 1.2 ||
         (this.noteDetector.hasTargets() && almost_equal(ideal, measured));
 
      
+      if (intake_subsystem.inIntake()) {
+        present = false;
+      }
+      
       Logger.recordOutput("NotePresent", present);
+
+      if (!present) {
+        noteDetector.setCheked(index);
+      }
 
       if (useNotPresent) {
         return present;

@@ -113,7 +113,7 @@ public class Robot extends LoggedRobot {
       m_autonomousCommand.cancel();
     }
 
-    m_robotContainer.offsetAngle();
+    // m_robotContainer.offsetAngle();
   }
 
   /** This function is called periodically during operator control. */
