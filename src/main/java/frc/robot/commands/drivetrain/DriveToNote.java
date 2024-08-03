@@ -34,7 +34,7 @@ public class DriveToNote extends Command {
         switch (Constants.currentMode) {
             case SIM:
                 m_translationalController = new PIDController(1.2, 0, 0);
-                m_rotationalController = new ProfiledPIDController(1, 0, 0,
+                m_rotationalController = new ProfiledPIDController(2, 0, 0,
                  new Constraints(Constants.Auton.MAX_ANGULAR_VELO_RPS * 2 * Math.PI, 
                  Constants.Auton.MAX_ANGULAR_ACCEL_RPS_SQUARED * 2 * Math.PI));
                 break;
@@ -85,10 +85,11 @@ public class DriveToNote extends Command {
 
             initialYaw = new Rotation2d(desiredRotation);
 
-            desiredSpeeds.omegaRadiansPerSecond = 
-                -m_rotationalController.calculate(
+            desiredSpeeds.omegaRadiansPerSecond = // TODO: FOR SOME REASON, SIM inversion is DIFFRENT than IRL version
+                m_rotationalController.calculate(
                     robotYaw.getRadians(), desiredRotation);
 
+            
             
             Logger.recordOutput("IntakeNoteCommand/desiredRotationRad", desiredRotation);
             Logger.recordOutput("IntakeNoteCommand/desiredSpeeds", desiredSpeeds);

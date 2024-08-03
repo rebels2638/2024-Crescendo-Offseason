@@ -151,7 +151,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("MidNotePresent", new NotePresent(noteDetector, intake, swerveDrive, 6, false));
     NamedCommands.registerCommand("AmpNoteNotPresent", new NotePresent(noteDetector, intake, swerveDrive, 5, true));
 
-    NamedCommands.registerCommand("DriveToMidNoteFromAmp", new DriveToPose(new Pose2d(new Translation2d(2.62, 6.64), new Rotation2d(Math.toRadians(-75))), swerveDrive));
+    NamedCommands.registerCommand("DriveToMidNoteFromAmp", DriveToPose.getCommand(new Pose2d(new Translation2d(2.62, 6.64), new Rotation2d(Math.toRadians(-75)))));
 
 
     // OP Controlls
@@ -183,7 +183,7 @@ public class RobotContainer {
 
     // SYSID STUFF
     // xboxTester.getAButton().whileTrue(swerveDrive.sysIDriveQuasistatic(Direction.kForward));
-    xboxTester.getAButton().whileTrue(new DriveToPose(new Pose2d(new Translation2d(7.11, 6.48), new Rotation2d(Math.toRadians(161.27))), swerveDrive));
+    xboxTester.getAButton().whileTrue(DriveToPose.getCommand(new Pose2d(new Translation2d(7.11, 6.48), new Rotation2d(Math.toRadians(161.27)))));
 
     xboxTester.getBButton().whileTrue(swerveDrive.sysIDriveQuasistatic(Direction.kReverse));
     xboxTester.getXButton().whileTrue(swerveDrive.sysIdDriveDynamic(Direction.kForward));

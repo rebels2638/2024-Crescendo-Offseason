@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import frc.robot.Constants;
 import frc.robot.commands.autoAligment.DriveToPose;
 import frc.robot.commands.autoAligment.NotePresent;
 import frc.robot.commands.compositions.IntakeNote;
@@ -13,12 +14,14 @@ import frc.robot.subsystems.drivetrain.vision.NoteDetector;
 import frc.robot.subsystems.intakeComp.Intake;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -35,7 +38,7 @@ public final class Autos {
     Pose2d p = PathPlannerPath.fromPathFile("ToAmpNoteFromAmpShort").getPreviewStartingHolonomicPose();
 
     Command midNote = new SequentialCommandGroup(
-          new DriveToPose(new Pose2d(new Translation2d(2.62, 6.64), new Rotation2d(Math.toRadians(76.62))), swerveDrive),
+          DriveToPose.getCommand(new Pose2d(new Translation2d(2.62, 6.64), new Rotation2d(Math.toRadians(76.62)))),
           new ConditionalCommand(
             new ParallelRaceGroup(
               new IntakeNote(swerveDrive, intake, noteDetector),
@@ -45,6 +48,7 @@ public final class Autos {
             () -> !noteDetector.checked(6)
           )
     );
+    
 
     Command midNoteInter = midNote.asProxy();
 

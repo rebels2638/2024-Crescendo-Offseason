@@ -26,7 +26,9 @@ public class NotePresent extends Command {
     }
 
     private boolean almost_equal(Pose2d a, Pose2d b) {
-      return Math.abs(Math.atan(a.getY()/a.getX())-Math.atan(b.getY()/b.getX())) < Math.toRadians(20) && Math.abs(a.getTranslation().getDistance(b.getTranslation())) <= 1.5; // deg and meter
+      double rot = Math.abs(Math.atan(a.getY()/a.getX())-Math.atan(b.getY()/b.getX()));
+      Logger.recordOutput("NotePresent/almostRot", rot);
+      return rot < Math.toRadians(20) && Math.abs(a.getTranslation().getDistance(b.getTranslation())) <= 1.5; // deg and meter
     }
 
     @Override
