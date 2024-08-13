@@ -10,11 +10,11 @@ public interface GyroIO {
     public static class GyroIOInputs {
         public Rotation2d yaw = new Rotation2d();
         public boolean isConnected = false;
+        public double[] odometryYawTimestamps = new double[] {};
+        public Rotation2d[] odometryYawPositions = new Rotation2d[] {};
+        public double yawVelocityRadPerSec = 0.0;
     }
 
     public default void updateInputs(GyroIOInputs inputs) {};
-    public default void setOffset(Rotation3d offset) {};
-    public default void zero() {};
-    public default void reset(Rotation3d inital) {};
 
 }

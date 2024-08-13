@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -76,6 +77,9 @@ public final class Constants {
     public static final double kMAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2;
     public static final double kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
     public static final double kMAX_ANGULAR_ACCELERATION_RADIANS_PER_SECOND_SQUARED = 2 * Math.PI;
+
+    public static final double TRACK_WIDTH_X = Units.inchesToMeters(30);
+    public static final double TRACK_WIDTH_Y = Units.inchesToMeters(30);
 
 
     // x, y from center of the robot
