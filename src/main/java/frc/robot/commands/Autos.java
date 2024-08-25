@@ -8,10 +8,13 @@ import frc.robot.Constants;
 import frc.robot.commands.autoAligment.DriveToPose;
 import frc.robot.commands.autoAligment.NotePresent;
 import frc.robot.commands.compositions.IntakeNote;
+import frc.robot.commands.compositions.ShootNoteAuto;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
 import frc.robot.subsystems.drivetrain.vision.NoteDetector;
 import frc.robot.subsystems.intakeComp.Intake;
+
+import java.util.ArrayList;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
@@ -21,7 +24,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -32,6 +34,10 @@ public final class Autos {
   /** Example static factory for an autonomous command. */
   public static Command exampleAuto(ExampleSubsystem subsystem) {
     return Commands.sequence(subsystem.exampleMethodCommand(), new ExampleCommand(subsystem));
+  }
+
+  public static Command Far1(SwerveDrive swerveDrive, Intake intake, NoteDetector noteDetector) {
+    return new AutoCommand(new String[] {"ToFar1FromAMP", "far1", "far2", "far3", "ToAMPFromFar1"}, swerveDrive, intake, noteDetector);
   }
 
   public static Command adaptableTest(SwerveDrive swerveDrive, Intake intake, NoteDetector noteDetector) {

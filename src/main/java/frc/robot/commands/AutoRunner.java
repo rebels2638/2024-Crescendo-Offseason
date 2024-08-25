@@ -104,7 +104,7 @@ public class AutoRunner {
         //3PAmpA2 << FAR 2
         pathChosen = "AdaptableTest";
         // return new PathPlannerAuto(pathChosen);
-        return Autos.adaptableTest(swerveDrive, intake, noteDetector);
+        return Autos.Far1(swerveDrive, intake, noteDetector);
     }
 
     public String getSelectedAutoName() {

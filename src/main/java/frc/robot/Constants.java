@@ -99,7 +99,7 @@ public final class Constants {
   }
 
   public static class FieldConstants {
-    // mid 1, 2, 3, 4, 5 (top to bottom), ampside, mid, source
+    // far 1, 2, 3, 4, 5 (top to bottom), ampside, mid, source
     // THIS IS FROM BLUE ORIGIN
     public static final Translation3d[] kNOTE_ARR = new Translation3d[] {
       new Translation3d(8.28, 7.44, 0),

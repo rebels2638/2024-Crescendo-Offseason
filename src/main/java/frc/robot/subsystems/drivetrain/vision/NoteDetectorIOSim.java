@@ -12,6 +12,7 @@ import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
 
 public class NoteDetectorIOSim implements NoteDetectorIO {
     private final SwerveDrive swerveDrive;
+    private final boolean[] taken = new boolean[] {true, true, false, false, false, false, false, false};
     public NoteDetectorIOSim(SwerveDrive swerveDrive) {
         this.swerveDrive = swerveDrive;
     }
@@ -38,6 +39,11 @@ public class NoteDetectorIOSim implements NoteDetectorIO {
         double minDist = Double.MAX_VALUE;
         inputs.hasTargets = false;
         for (int i = 0; i < Constants.FieldConstants.kNOTE_ARR.length; i++) {
+            if (taken[i]) {
+                inputs.hasTargets = false;
+                continue;
+            }
+    
             Translation3d closestNote = Constants.FieldConstants.kNOTE_ARR[i];
             double vxAngle = ((cameraPose.getRotation().getZ() - 
                         Math.atan2(closestNote.getY() - cameraPose.getY(), 

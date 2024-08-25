@@ -48,7 +48,7 @@ public class DriveToNote extends Command {
                 m_rotationalController.setTolerance(Math.toRadians(5));
                 break;
         }
-
+        m_rotationalController.enableContinuousInput(0, Math.PI * 2);
         addRequirements(swerveDrive);
     }
 
