@@ -28,7 +28,8 @@ public class AutoCommand extends Command {
     private final SwerveDrive swerveDrive;
     private final Intake intake;
     private final NoteDetector noteDetector;
-    
+    private boolean isRed = false;
+
     private Command currentCommand = new Command() {
         @Override
         public boolean isFinished() {
@@ -59,11 +60,30 @@ public class AutoCommand extends Command {
 
     @Override
     public void initialize() {
-        Pose2d p = PathPlannerPath.fromPathFile(args[0]).getPreviewStartingHolonomicPose();
-        new InstantCommand(() -> swerveDrive.resetPose(
-            new Pose2d(p.getTranslation(), 
-            new Rotation2d(p.getRotation().unaryMinus().getRadians() + Math.PI / 2)))
-        ).schedule();
+        var alliance = DriverStation.getAlliance();
+        if (alliance.isPresent()) {
+            isRed =  alliance.get() == DriverStation.Alliance.Red;
+        }
+
+        PathPlannerPath path = PathPlannerPath.fromPathFile(args[0]);
+        if (isRed) {
+            path = path.flipPath();
+
+            Pose2d p = path.getPreviewStartingHolonomicPose();
+            new InstantCommand(() -> swerveDrive.resetPose(
+                new Pose2d(p.getTranslation(), 
+                new Rotation2d(p.getRotation().unaryMinus().getRadians() + Math.PI / 2 + Math.PI)))
+            ).schedule();
+        }
+        else {
+            Pose2d p = path.getPreviewStartingHolonomicPose();
+            new InstantCommand(() -> swerveDrive.resetPose(
+                new Pose2d(p.getTranslation(), 
+                new Rotation2d(p.getRotation().unaryMinus().getRadians() + Math.PI / 2)))
+            ).schedule();
+        }
+
+        
 
     }
     @Override
@@ -91,7 +111,8 @@ public class AutoCommand extends Command {
                  cmd.substring(0, 2).equals("Fr")) {
             Logger.recordOutput("AutoCommand/currentCommand", "driveToNote");
 
-            currentCommand = AutoBuilder.followPath(PathPlannerPath.fromPathFile(cmd));
+            PathPlannerPath path = PathPlannerPath.fromPathFile(cmd);
+            currentCommand = AutoBuilder.followPath(path);
         }
         
         else if (NotePresent.notePresent(noteDetector, intake, swerveDrive, getIndex(cmd), false)) {
@@ -114,12 +135,6 @@ public class AutoCommand extends Command {
             }
             else {
                 offset = new Translation2d(-0.5, -0.5);
-            }
-
-            boolean isRed = true;
-            var alliance = DriverStation.getAlliance();
-            if (alliance.isPresent()) {
-                isRed =  alliance.get() == DriverStation.Alliance.Red;
             }
 
             if (isRed) {

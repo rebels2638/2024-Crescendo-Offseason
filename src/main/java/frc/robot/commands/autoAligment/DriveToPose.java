@@ -19,10 +19,10 @@ public final class DriveToPose {
 
     // Builds a follow path holonomic path using field constants.
     public static Command getCommand(Pose2d endGoal) {
-        var alliance = DriverStation.getAlliance();
-        if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
-            endGoal = GeometryUtil.flipFieldPose(endGoal);
-        } 
+        // var alliance = DriverStation.getAlliance();
+        // if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+        //     endGoal = GeometryUtil.flipFieldPose(endGoal);
+        // } 
         
         return AutoBuilder.pathfindToPose(endGoal, new PathConstraints(Constants.Auton.MAX_SPEED, Constants.Auton.MAX_ACCELERATION, 
             Constants.Auton.MAX_ANGULAR_VELO_RPS, Constants.Auton.MAX_ANGULAR_ACCEL_RPS_SQUARED), 0, 0);
