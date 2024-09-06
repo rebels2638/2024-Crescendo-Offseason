@@ -21,12 +21,13 @@ public class ModuleIOTalon implements ModuleIO {
     private TalonFX m_drive;
     
     private final PIDController m_angleFeedbackController = new PIDController(6, 0.0, 0.01);
-    private final PIDController m_driveFeedbackController = new PIDController(0.00, 0, 0);
+    private final PIDController m_driveFeedbackController = new PIDController(2, 0, 0);
 
     private final SimpleMotorFeedforward m_angleFeedforward = new SimpleMotorFeedforward(.23, 0.0000); // .23
-    private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0.22, 1.08,  0.0);
+    private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0.22, 2.16); // 0.22 2.16 0
     
     private double m_angleVoltage = 0;
+
     private double m_driveVoltage = 0;
     
     private double anglePositionRad = 0;
@@ -95,7 +96,7 @@ public class ModuleIOTalon implements ModuleIO {
         
 
         m_angleFeedbackController.setTolerance(Math.toRadians(2));
-        m_driveFeedbackController.setTolerance(0.01);
+        m_driveFeedbackController.setTolerance(0.1);
 
         m_angleFeedbackController.enableContinuousInput(0, 2 * Math.PI);
     }

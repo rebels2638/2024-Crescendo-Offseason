@@ -102,7 +102,7 @@ public class AutoRunner {
         //4PMidMASScoreTrans
         //2.5PAmpA1
         //3PAmpA2 << FAR 2
-        pathChosen = "AdaptableTest";
+        pathChosen = "configtauto";
         // return new PathPlannerAuto(pathChosen);
         return Autos.Far1(swerveDrive, intake, noteDetector);
     }
