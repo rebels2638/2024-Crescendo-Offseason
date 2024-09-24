@@ -24,7 +24,7 @@ public final class DriveToPose {
             endGoal = GeometryUtil.flipFieldPose(endGoal);
         } 
         
-        return AutoBuilder.pathfindToPose(endGoal, new PathConstraints(Constants.Auton.MAX_SPEED, Constants.Auton.MAX_ACCELERATION, 
+        return AutoBuilder.pathfindToPose(endGoal, new PathConstraints(Constants.Auton.MAX_MODULE_SPEED, Constants.Auton.MAX_ACCELERATION, 
             Constants.Auton.MAX_ANGULAR_VELO_RPS, Constants.Auton.MAX_ANGULAR_ACCEL_RPS_SQUARED), 0, 0);
     }
 }

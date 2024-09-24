@@ -40,6 +40,15 @@ public final class Autos {
     return new AutoCommand(new String[] {"ToFar1FromAMP", "far1", "far2", "far3", "ToAMPFromFar1"}, swerveDrive, intake, noteDetector);
   }
 
+  public static Command configAuto(SwerveDrive swerveDrive) {
+    Pose2d p = PathPlannerPath.fromPathFile("configtpath").getPreviewStartingHolonomicPose();
+    return new SequentialCommandGroup(      
+      new InstantCommand(() -> swerveDrive.resetPose(new Pose2d(p.getTranslation(), p.getRotation()/*new Rotation2d(p.getRotation().unaryMinus().getRadians()+Math.PI/2)))*/))),
+      AutoBuilder.followPath(PathPlannerPath.fromPathFile("configtpath")),
+      AutoBuilder.followPath(PathPlannerPath.fromPathFile("configt2path")));
+
+  }
+
   public static Command adaptableTest(SwerveDrive swerveDrive, Intake intake, NoteDetector noteDetector) {
     Pose2d p = PathPlannerPath.fromPathFile("ToAmpNoteFromAmpShort").getPreviewStartingHolonomicPose();
 

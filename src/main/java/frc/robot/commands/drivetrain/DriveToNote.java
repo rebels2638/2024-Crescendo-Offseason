@@ -11,6 +11,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.lib.util.RebelUtil;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
 import frc.robot.subsystems.drivetrain.vision.NoteDetector;
 import frc.robot.subsystems.intakeComp.Intake;
@@ -25,6 +26,7 @@ public class DriveToNote extends Command {
 
     private Rotation2d initialYaw = new Rotation2d();
     private boolean over = false;
+    private double drivingSpeedMps = 1;
 
     public DriveToNote(SwerveDrive swerveDrive, Intake intakeSubsystem, NoteDetector noteDetector) {
         this.intake = intakeSubsystem;
@@ -40,8 +42,8 @@ public class DriveToNote extends Command {
                 break;
         
             default:
-                m_translationalController = new PIDController(1, 0, 0);
-                m_rotationalController = new ProfiledPIDController(2, 0, 0,
+                m_translationalController = new PIDController(1.6, 0, 0);
+                m_rotationalController = new ProfiledPIDController(1.5, 0, 0,
                  new Constraints(Constants.Auton.MAX_ANGULAR_VELO_RPS * 2 * Math.PI, 
                  Constants.Auton.MAX_ANGULAR_ACCEL_RPS_SQUARED * 2 * Math.PI));
                 
@@ -56,6 +58,12 @@ public class DriveToNote extends Command {
     public void initialize() {
         initialYaw = swerveDrive.getPose().getRotation();
         Logger.recordOutput("IntakeNoteCommand/end", false);
+
+        double currentSpeed = Math.sqrt(Math.pow(swerveDrive.getMeasuredFeildRelativeSpeeds().vxMetersPerSecond,2) + 
+                                        Math.pow(swerveDrive.getMeasuredFeildRelativeSpeeds().vyMetersPerSecond,2));
+
+        drivingSpeedMps = RebelUtil.constrain(currentSpeed, 1, 1.6);
+        Logger.recordOutput("IntakeNoteCommand/drivingSpeedMps", drivingSpeedMps);
     }
 
     @Override
@@ -78,7 +86,11 @@ public class DriveToNote extends Command {
                 m_translationalController.calculate(intakeTranslation3d.getX(), noteTranslation2d.getX());
             desiredSpeeds.vyMetersPerSecond = 
                 m_translationalController.calculate(intakeTranslation3d.getY(), noteTranslation2d.getY());
-
+            
+            double scaler = Math.sqrt(Math.pow(drivingSpeedMps,2)/(Math.pow(desiredSpeeds.vxMetersPerSecond,2) + Math.pow(desiredSpeeds.vyMetersPerSecond,2)));
+            desiredSpeeds.vxMetersPerSecond *= scaler;
+            desiredSpeeds.vyMetersPerSecond *= scaler;
+            
             double desiredRotation = Math.atan2(
                         swerveDrive.getPose().getY() - noteTranslation2d.getY(), 
                         swerveDrive.getPose().getX() - noteTranslation2d.getX());

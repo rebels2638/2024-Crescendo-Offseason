@@ -19,6 +19,7 @@ import frc.robot.commands.compositions.CancelIntakeNote;
 import frc.robot.commands.compositions.FeedAndHoldNote;
 import frc.robot.commands.compositions.IntakeNote;
 import frc.robot.commands.compositions.IntakeNoteAuto;
+import frc.robot.commands.compositions.IntakeNoteManual;
 import frc.robot.commands.compositions.ScoreAMP;
 import frc.robot.commands.compositions.ShootNote;
 import frc.robot.commands.compositions.ShootNoteAuto;
@@ -175,6 +176,7 @@ public class RobotContainer {
     // driver controlls
     this.xboxDriver.getXButton().onTrue(new InstantCommand(() -> swerveDrive.zeroGyro()));
     this.xboxDriver.getLeftBumper().onTrue(new IntakeNote(swerveDrive, intake, noteDetector));
+    //this.xboxDriver.getLeftBumper().onTrue(new IntakeNoteManual());
 
     this.xboxDriver.getRightMiddleButton().onTrue(new RollIntakeEject());
     this.xboxDriver.getRightBumper().onTrue(new CancelIntakeNote(intakeG, feedHold, swerveDrive));

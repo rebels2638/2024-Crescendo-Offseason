@@ -61,7 +61,7 @@ public class AutoRunner {
                 new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
                         Constants.Auton.TRANSLATION_PID_CONFIG, // Translation PID constants
                         Constants.Auton.ANGLE_PID_CONFIG, // Rotation PID constants
-                        Constants.Auton.MAX_SPEED, // Max module speed, in m/s
+                        Constants.Auton.MAX_MODULE_SPEED, // Max module speed, in m/s
                         0.5384061785684372, // Drive base radius in meters. Distance from robot center to furthest module.
                         new ReplanningConfig() // Default path replanning config. See the API for the options here
                 ),
@@ -104,7 +104,8 @@ public class AutoRunner {
         //3PAmpA2 << FAR 2
         pathChosen = "configtauto";
         // return new PathPlannerAuto(pathChosen);
-        return Autos.Far1(swerveDrive, intake, noteDetector);
+        // return Autos.Far1(swerveDrive, intake, noteDetector);
+        return Autos.configAuto(swerveDrive);
     }
 
     public String getSelectedAutoName() {

@@ -99,7 +99,7 @@ public class NoteDetector extends SubsystemBase {
         Translation2d absoluteTranslation2d = realtiveTranslation2d.
             rotateBy(new Rotation2d(cameraPose.getRotation().getZ()));
         
-        absoluteTranslation2d = swerveDrive.getPose().getTranslation().minus(absoluteTranslation2d);
+        absoluteTranslation2d = swerveDrive.getPose().getTranslation().plus(absoluteTranslation2d);
         prevSample = absoluteTranslation2d;
 
         // TODO: Fixed sim :skull:
