@@ -1,7 +1,6 @@
 
 <br/>
 <div align="center">
-<a href="https://github.com/ShaanCoding/ReadME-Generator">
 <img src="https://i.postimg.cc/W162kzG2/Image-Editor.png" alt="Logo" width="80" height="80">
 </a>
 <h3 align="center">Rebel Robotics 2024</h3>
