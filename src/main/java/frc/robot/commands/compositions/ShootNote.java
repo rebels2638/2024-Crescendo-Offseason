@@ -7,6 +7,9 @@ import frc.robot.commands.intake.StopIntake;
 import frc.robot.commands.shooterComp.ShooterStop;
 import frc.robot.commands.shooterComp.ShooterWindup;
 
+/**
+ * A command group that represents shooting a note.
+ */
 public class ShootNote extends SequentialCommandGroup {
     public ShootNote() {
         addCommands(
