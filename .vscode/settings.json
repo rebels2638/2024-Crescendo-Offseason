@@ -1,4 +1,8 @@
 {
     "java.debug.settings.onBuildFailureProceed": true,
+<<<<<<< HEAD
     "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx4G -Xms100m -Xlog:disable"
 }
+=======
+}
+>>>>>>> 8e13fb0c0fb3d4310145fb902f49aa49b642e19d
