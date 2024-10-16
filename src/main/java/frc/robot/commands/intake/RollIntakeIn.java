@@ -18,6 +18,8 @@ public class RollIntakeIn extends Command {
         } else {
             intakeSubsystem.setVelocityRadSec(Math.toRadians(360 * 8)); //Use radians directly
         }
+        // intakeSubsystem.setVelocityRadSec(0); //Use radians directly
+
     }
     
     @Override

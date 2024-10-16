@@ -175,8 +175,8 @@ public class RobotContainer {
 
     // driver controlls
     this.xboxDriver.getXButton().onTrue(new InstantCommand(() -> swerveDrive.zeroGyro()));
-    this.xboxDriver.getLeftBumper().onTrue(new IntakeNote(swerveDrive, intake, noteDetector));
-    //this.xboxDriver.getLeftBumper().onTrue(new IntakeNoteManual());
+    // this.xboxDriver.getLeftBumper().onTrue(new IntakeNote(swerveDrive, intake, noteDetector));
+    this.xboxDriver.getLeftBumper().onTrue(new IntakeNoteManual());
 
     this.xboxDriver.getRightMiddleButton().onTrue(new RollIntakeEject());
     this.xboxDriver.getRightBumper().onTrue(new CancelIntakeNote(intakeG, feedHold, swerveDrive));

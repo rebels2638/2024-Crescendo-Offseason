@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 2.67,
+        "x": 1.9346939692452838,
         "y": 5.51843359236209
       },
       "prevControl": {
-        "x": 2.2902921778227214,
+        "x": 1.4774983135223332,
         "y": 5.51843359236209
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "StartMidMidNote"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -38,12 +38,12 @@
     "maxAngularAcceleration": 180.0
   },
   "goalEndState": {
-    "velocity": 0.2,
+    "velocity": 2.0,
     "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "MidNote",
+  "folder": null,
   "previewStartingState": {
     "rotation": 180.0,
     "velocity": 0

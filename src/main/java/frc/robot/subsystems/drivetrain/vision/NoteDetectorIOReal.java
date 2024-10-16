@@ -13,6 +13,7 @@ public class NoteDetectorIOReal implements NoteDetectorIO {
         inputs.hasTargets = llTable.getEntry("tv").getDouble(0) == 1;
         inputs.txRadians = -Math.toRadians(llTable.getEntry("tx").getDouble(0));
         inputs.tyRadians = Math.toRadians(llTable.getEntry("ty").getDouble(0));
+        inputs.totalLatencySeconds = (llTable.getEntry("cl").getDouble(0) + llTable.getEntry("tl").getDouble(0))/1000;
     }
 
 }

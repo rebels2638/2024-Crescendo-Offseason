@@ -1,16 +1,19 @@
 package frc.robot.subsystems.drivetrain.vision;
 
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.DelayQueue;
+
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.util.GeometryUtil;
-
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
@@ -51,11 +54,16 @@ public class NoteDetector extends SubsystemBase {
         Logger.processInputs("NoteDetector", inputs);
 
         Logger.recordOutput("NoteDetector/chekedNotes", checked);
-        Logger.recordOutput("NoteDetector/estimNotePose", new Translation3d(getNoteFieldRelativePose().getX(), getNoteFieldRelativePose().getY(),0));
+        Logger.recordOutput("NoteDetector/estimFeildRelativeNotePose", new Translation3d(getNoteFieldRelativePose().getX(), getNoteFieldRelativePose().getY(),0));
+
     }
 
     public boolean hasTargets() {
         return inputs.hasTargets;
+    }
+
+    public Translation2d getNoteRobotRelativePose() {
+        return getNoteFieldRelativePose().minus(swerveDrive.getPose().getTranslation()).rotateBy(swerveDrive.getPose().getRotation());
     }
 
     public Translation2d getNoteFieldRelativePose() {
@@ -64,6 +72,9 @@ public class NoteDetector extends SubsystemBase {
             prevSample = inputs.bestNote;
             return inputs.bestNote;
         }
+        Pose2d delayedPose = swerveDrive.getPoseAtTimestamp(Timer.getFPGATimestamp() - inputs.totalLatencySeconds);
+        Logger.recordOutput("NoteDetector/delayedPose", delayedPose);
+
         double pitch = Math.PI / 2 - (Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_POSE.getRotation().getY() - inputs.tyRadians);
         double yaw = inputs.txRadians;
 
@@ -76,10 +87,10 @@ public class NoteDetector extends SubsystemBase {
         Logger.recordOutput("NoteDetector/xMeters", xMeters);
         Logger.recordOutput("NoteDetector/yMeters", yMeters);
 
-        Rotation2d robotYaw = swerveDrive.getPose().getRotation();
+        Rotation2d robotYaw = delayedPose.getRotation();
         Translation2d cameraTranslation2d = Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_POSE.getTranslation().toTranslation2d();
         cameraTranslation2d = cameraTranslation2d.rotateBy(robotYaw);
-        cameraTranslation2d = cameraTranslation2d.plus(swerveDrive.getPose().getTranslation());
+        cameraTranslation2d = cameraTranslation2d.plus(delayedPose.getTranslation());
 
         Translation3d cameraTranslation = new Translation3d(
                                                     cameraTranslation2d.getX(), 
@@ -96,10 +107,11 @@ public class NoteDetector extends SubsystemBase {
 
 
         Translation2d realtiveTranslation2d = new Translation2d(xMeters, yMeters);
+        Logger.recordOutput("NoteDetector/estimRobotRelativeNotePose", realtiveTranslation2d);
         Translation2d absoluteTranslation2d = realtiveTranslation2d.
             rotateBy(new Rotation2d(cameraPose.getRotation().getZ()));
         
-        absoluteTranslation2d = swerveDrive.getPose().getTranslation().plus(absoluteTranslation2d);
+        absoluteTranslation2d = delayedPose.getTranslation().minus(absoluteTranslation2d);
         prevSample = absoluteTranslation2d;
 
         // TODO: Fixed sim :skull:

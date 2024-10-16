@@ -9,6 +9,7 @@ import frc.robot.commands.autoAligment.DriveToPose;
 import frc.robot.commands.autoAligment.NotePresent;
 import frc.robot.commands.compositions.IntakeNote;
 import frc.robot.commands.compositions.ShootNoteAuto;
+import frc.robot.commands.pivot.PivotToTorus;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
 import frc.robot.subsystems.drivetrain.vision.NoteDetector;
@@ -49,8 +50,23 @@ public final class Autos {
 
   }
 
+  public static Command fourPeiceMid(SwerveDrive swerveDrive, Intake intake, NoteDetector noteDetector) {
+    Pose2d p = PathPlannerPath.fromPathFile("ToMidNoteFromMid").getPreviewStartingHolonomicPose();
+    return new SequentialCommandGroup(      
+      new InstantCommand(() -> swerveDrive.resetPose(new Pose2d(p.getTranslation(), p.getRotation()/*new Rotation2d(p.getRotation().unaryMinus().getRadians()+Math.PI/2)))*/))),
+      new PivotToTorus(),
+      AutoBuilder.followPath(PathPlannerPath.fromPathFile("ToMidNoteFromMid")),
+      new IntakeNote(swerveDrive, intake, noteDetector),
+      AutoBuilder.followPath(PathPlannerPath.fromPathFile("FromMidNoteToMid")),
+      AutoBuilder.followPath(PathPlannerPath.fromPathFile("ToSourceNoteFromMid")),
+      AutoBuilder.followPath(PathPlannerPath.fromPathFile("FromSourceNoteToMid")),
+      AutoBuilder.followPath(PathPlannerPath.fromPathFile("ToAMPNoteFromMidTurn")),
+      AutoBuilder.followPath(PathPlannerPath.fromPathFile("FromAMPNoteToMidTurn")));
+  }
+
   public static Command adaptableTest(SwerveDrive swerveDrive, Intake intake, NoteDetector noteDetector) {
     Pose2d p = PathPlannerPath.fromPathFile("ToAmpNoteFromAmpShort").getPreviewStartingHolonomicPose();
+    // return new SequentialCommandGroup(null)
 
     Command midNote = new SequentialCommandGroup(
           DriveToPose.getCommand(new Pose2d(new Translation2d(2.62, 6.64), new Rotation2d(Math.toRadians(76.62)))),

@@ -11,6 +11,7 @@ public interface NoteDetectorIO {
         public double tyRadians = 0;
         public boolean hasTargets = false;
         public Translation2d bestNote = new Translation2d();
+        public double totalLatencySeconds = 0;
     }
 
     public default void updateInputs(NoteDetectorIOInputs inputs) {};

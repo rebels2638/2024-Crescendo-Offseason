@@ -50,10 +50,10 @@
   ],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 12.0,
-    "maxAcceleration": 4.0,
-    "maxAngularVelocity": 360.0,
-    "maxAngularAcceleration": 180.0
+    "maxVelocity": 2.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 216.0,
+    "maxAngularAcceleration": 360.0
   },
   "goalEndState": {
     "velocity": 0.8,
@@ -61,7 +61,7 @@
     "rotateFast": true
   },
   "reversed": false,
-  "folder": "Far5",
+  "folder": null,
   "previewStartingState": {
     "rotation": 180.0,
     "velocity": 0

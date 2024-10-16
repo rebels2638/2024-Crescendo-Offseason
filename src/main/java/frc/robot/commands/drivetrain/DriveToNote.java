@@ -43,7 +43,7 @@ public class DriveToNote extends Command {
         
             default:
                 m_translationalController = new PIDController(1.6, 0, 0);
-                m_rotationalController = new ProfiledPIDController(1.5, 0, 0,
+                m_rotationalController = new ProfiledPIDController(1.2, 0, 0,
                  new Constraints(Constants.Auton.MAX_ANGULAR_VELO_RPS * 2 * Math.PI, 
                  Constants.Auton.MAX_ANGULAR_ACCEL_RPS_SQUARED * 2 * Math.PI));
                 
@@ -57,6 +57,7 @@ public class DriveToNote extends Command {
     @Override
     public void initialize() {
         initialYaw = swerveDrive.getPose().getRotation();
+        Logger.recordOutput("IntakeNOteCommand/initialYaw", initialYaw);
         Logger.recordOutput("IntakeNoteCommand/end", false);
 
         double currentSpeed = Math.sqrt(Math.pow(swerveDrive.getMeasuredFeildRelativeSpeeds().vxMetersPerSecond,2) + 

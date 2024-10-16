@@ -120,7 +120,7 @@ public final class Constants {
     //   new Pose3d(new Translation3d(-0.15, -0.47,  0.7), new Rotation3d(Math.toRadians(0), Math.toRadians(30), Math.toRadians(5)));
     
     public static final Pose3d kNOTE_DETECTOR_CAMERA_POSE = // SIM
-      new Pose3d(new Translation3d(-0.15, -0.47,  0.7), new Rotation3d(Math.toRadians(0), Math.toRadians(32), Math.toRadians(174)));
+      new Pose3d(new Translation3d(0.076, 0.0,  0.47), new Rotation3d(Math.toRadians(0), Math.toRadians(15.5), Math.toRadians(0)));
     public static final double kNOTE_DETECTOR_CAMERA_FOV_X_RAD = Math.toRadians(29.8 * 2);
     public static final double kNOTE_DETECTOR_CAMERA_FOV_Y_RAD = Math.toRadians(24.85 * 2);
     public static final double kNOTE_DETECTOR_CAMERA_MAX_RANGE_METERS = 2;

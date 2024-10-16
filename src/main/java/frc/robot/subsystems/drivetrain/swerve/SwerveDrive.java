@@ -1,13 +1,14 @@
 package frc.robot.subsystems.drivetrain.swerve;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.util.GeometryUtil;
-
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -21,7 +22,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Voltage;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
@@ -90,6 +90,8 @@ public class SwerveDrive extends SubsystemBase {
     private final Config m_sysDriveConfig;
     private final SysIdRoutine m_sysDriveIdRoutine;
     
+    private Queue<Pair<Pose2d,Double>> poseQueue = new LinkedList<Pair<Pose2d,Double>>();
+
     public SwerveDrive() {
         switch (Constants.currentMode) {
             case SIM:
@@ -186,7 +188,11 @@ public class SwerveDrive extends SubsystemBase {
         updateOdometry();
         odometryLock.unlock();
 
-        
+        Pair<Pose2d, Double> pair = new Pair<Pose2d, Double>(m_poseEstimator.getEstimatedPosition(), Double.valueOf(Timer.getFPGATimestamp()));
+        poseQueue.add(pair);
+        if (Timer.getFPGATimestamp() - poseQueue.peek().getSecond().doubleValue() > 1) {
+            poseQueue.poll();
+        }
         
         // if (DriverStation.isAutonomous()) {
         //     // type PathPlannerAuto
@@ -285,11 +291,9 @@ public class SwerveDrive extends SubsystemBase {
         //     pose = GeometryUtil.flipFieldPose(pose);
         // } 
 
-        zeroGyro();
-        gyroIO.setOffset(new Rotation3d(0,0, 0));
         yaw = pose.getRotation();
         Logger.recordOutput("INtialYAW", yaw.getDegrees());
-        m_poseEstimator.resetPosition(pose.getRotation(), positions, pose);
+        m_poseEstimator.resetPosition(gyroInputs.yaw, positions, pose);
         odometryLock.unlock();
     }
 
@@ -311,6 +315,25 @@ public class SwerveDrive extends SubsystemBase {
         Pose2d estimate = m_poseEstimator.getEstimatedPosition();
         odometryLock.unlock();
         return estimate;
+    }
+
+    public Pose2d getPoseAtTimestamp(double time) {
+        double lowestError = Double.MAX_VALUE;
+        double currentTime = Timer.getFPGATimestamp();
+        Pose2d pose = poseQueue.peek().getFirst();
+        Logger.recordOutput("SwerveDrive/queueLength", poseQueue.size());
+        for (Pair<Pose2d, Double> pair : poseQueue) {
+            double currentError = Math.abs(time - pair.getSecond().doubleValue());
+            if (currentError < lowestError) {
+                lowestError = time - pair.getSecond().doubleValue();
+                pose = pair.getFirst();
+            }
+            else {
+                break;
+            }
+        }
+
+        return pose;
     }
 
     public SwerveModulePosition[] getSwerveModulePositions() {
