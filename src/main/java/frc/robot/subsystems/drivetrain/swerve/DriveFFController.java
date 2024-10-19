@@ -26,14 +26,14 @@ public class DriveFFController {
 
             default:
                 points.add(new double[] {0, 0, 0});
-                points.add(new double[] {DrivetrainConstants.kMAX_SPEED_METERS_PER_SECOND / 2, 0, 0});
-                points.add(new double[] {DrivetrainConstants.kMAX_SPEED_METERS_PER_SECOND, 0, 0});
-                points.add(new double[] {0, DrivetrainConstants.kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND / 2, 0});
-                points.add(new double[] {0, DrivetrainConstants.kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND, 0});
-                points.add(new double[] {DrivetrainConstants.kMAX_SPEED_METERS_PER_SECOND, DrivetrainConstants.kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND, 0.635});
-                points.add(new double[] {DrivetrainConstants.kMAX_SPEED_METERS_PER_SECOND / 2, DrivetrainConstants.kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND, 0.33});
-                points.add(new double[] {DrivetrainConstants.kMAX_SPEED_METERS_PER_SECOND, DrivetrainConstants.kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND / 2, 0.4});
-                points.add(new double[] {DrivetrainConstants.kMAX_SPEED_METERS_PER_SECOND / 2, DrivetrainConstants.kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND / 2, 0.15});
+                points.add(new double[] {DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND / 2, 0, 0});
+                points.add(new double[] {DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND, 0, 0});
+                points.add(new double[] {0, DrivetrainConstants.kMAX_DRIVETRAIN_ANGULAR_VELOCITY_RADIANS_PER_SECOND / 2, 0});
+                points.add(new double[] {0, DrivetrainConstants.kMAX_DRIVETRAIN_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0});
+                points.add(new double[] {DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND, DrivetrainConstants.kMAX_DRIVETRAIN_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0.635});
+                points.add(new double[] {DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND / 2, DrivetrainConstants.kMAX_DRIVETRAIN_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 0.33});
+                points.add(new double[] {DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND, DrivetrainConstants.kMAX_DRIVETRAIN_ANGULAR_VELOCITY_RADIANS_PER_SECOND / 2, 0.4});
+                points.add(new double[] {DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND / 2, DrivetrainConstants.kMAX_DRIVETRAIN_ANGULAR_VELOCITY_RADIANS_PER_SECOND / 2, 0.15});
                 break;
         }
     }
@@ -158,11 +158,11 @@ public class DriveFFController {
         double r;
         switch (Constants.currentMode) {
             case SIM:
-                r = Math.sqrt(Math.pow((a[0] - b[0]) / DrivetrainConstants.kMAX_SPEED_METERS_PER_SECOND, 2) + Math.pow((a[1] - b[1]) / DrivetrainConstants.kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND, 2));
+                r = Math.sqrt(Math.pow((a[0] - b[0]) / DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND, 2) + Math.pow((a[1] - b[1]) / DrivetrainConstants.kMAX_DRIVETRAIN_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 2));
                 break;
 
             default:
-                r = Math.sqrt(Math.pow((a[0] - b[0]) / DrivetrainConstants.kMAX_SPEED_METERS_PER_SECOND, 2) + Math.pow((a[1] - b[1]) / DrivetrainConstants.kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND, 2));
+                r = Math.sqrt(Math.pow((a[0] - b[0]) / DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND, 2) + Math.pow((a[1] - b[1]) / DrivetrainConstants.kMAX_DRIVETRAIN_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 2));
                 break;
         }
 

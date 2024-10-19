@@ -72,11 +72,18 @@ public final class Constants {
   }
 
   public static class DrivetrainConstants {
-    public static final double kMAX_SPEED_METERS_PER_SECOND = 2;
-    public static final double kMAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2;
-    public static final double kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI * 0.6;
-    public static final double kMAX_ANGULAR_ACCELERATION_RADIANS_PER_SECOND_SQUARED = 2 * Math.PI;
+    // TODO: CHANGE THEESEANDKJANSDKLJWENF LKJDSBLGKJFNadzs
+    public static final double kMAX_DRIVETRAIN_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND = 2;
+    public static final double kMAX_DRIVETRAIN_TRANSLATIONAL_ACCELERATION_METERS_PER_SECOND_SQUARED = 2;
+    public static final double kMAX_DRIVETRAIN_TRANSLATIONAL_DECELERATION_METERS_PER_SECOND_SQUARED = 2;
 
+    public static final double kMAX_DRIVETRAIN_ANGULAR_VELOCITY_RADIANS_PER_SECOND = 2 * Math.PI * 0.6;
+    public static final double kMAX_DRIVETRAIN_ANGULAR_ACCELERATION_RADIANS_PER_SECOND_SQUARED = 2 * Math.PI;
+    public static final double kMAX_DRIVETRAIN_ANGULAR_DECELERATION_RADIANS_PER_SECOND_SQUARED = 2 * Math.PI;
+
+    public static final double kMAX_MODULE_DRIVE_VELOCITY_METERS_PER_SECOND = 4.5;
+    public static final double kMAX_MODULE_DRIVE_ACCELERATION_METERS_PER_SECOND = 2.5;
+    public static final double kMAX_MODULE_DRIVE_DECELERATION_METERS_PER_SECOND = 2.5;
 
     // x, y from center of the robot
     public static final Translation2d kFRONT_RIGHT_POSITION_METERS = new Translation2d(0.38, -0.38);

@@ -46,9 +46,9 @@ public class AbsoluteFieldDrive extends Command {
     public void execute() {
         // Calculate speeds based on input and max speed constants.
         ChassisSpeeds speeds = new ChassisSpeeds(
-            vX.getAsDouble() * Constants.DrivetrainConstants.kMAX_SPEED_METERS_PER_SECOND * invert,
-            vY.getAsDouble() * Constants.DrivetrainConstants.kMAX_SPEED_METERS_PER_SECOND * invert,
-            heading.getAsDouble() * Constants.DrivetrainConstants.kMAX_ANGULAR_SPEED_RADIANS_PER_SECOND * invert
+            vX.getAsDouble() * Constants.DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND * invert,
+            vY.getAsDouble() * Constants.DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND * invert,
+            heading.getAsDouble() * Constants.DrivetrainConstants.kMAX_DRIVETRAIN_ANGULAR_VELOCITY_RADIANS_PER_SECOND * invert
         );
 
         // Drive the swerve drive subsystem with field-relative speeds.
