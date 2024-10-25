@@ -52,7 +52,9 @@ public class AbsoluteFieldDrive extends Command {
         );
 
         // Drive the swerve drive subsystem with field-relative speeds.
-        swerve.driveFieldRelative(speeds);
+        if (!DriveToNote.isRunning) {
+            swerve.driveFieldRelative(speeds);
+        }
     }
 
     // Called when the command ends or is interrupted.

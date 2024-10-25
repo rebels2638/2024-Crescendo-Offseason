@@ -2,13 +2,17 @@ package frc.robot.commands.drivetrain;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.util.GeometryUtil;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.lib.util.RebelUtil;
@@ -29,6 +33,10 @@ public class DriveToNote extends Command {
     private Rotation2d initialYaw = new Rotation2d();
     private boolean over = false;
     private double drivingSpeedMps = 1;
+    private boolean initalReset = false;
+    private Translation2d intialNotePose = null;
+
+    public static boolean isRunning = false;
 
     // Constructor for the DriveToNote command
     public DriveToNote(SwerveDrive swerveDrive, Intake intakeSubsystem, NoteDetector noteDetector) {
@@ -47,7 +55,7 @@ public class DriveToNote extends Command {
         
             default:
                 m_translationalController = new PIDController(1.6, 0, 0);
-                m_rotationalController = new ProfiledPIDController(1.2, 0, 0,
+                m_rotationalController = new ProfiledPIDController(2, 0, 0.1,
                  new Constraints(Constants.Auton.MAX_ANGULAR_VELO_RPS * 2 * Math.PI, 
                  Constants.Auton.MAX_ANGULAR_ACCEL_RPS_SQUARED * 2 * Math.PI)); // Real rotational controller
                 
@@ -55,14 +63,16 @@ public class DriveToNote extends Command {
                 break;
         }
         m_rotationalController.enableContinuousInput(0, Math.PI * 2); // Enable continuous input for rotation
-        addRequirements(swerveDrive); // Declare that this command requires the swerve drive subsystem
+        // addRequirements(swerveDrive); // Declare that this command requires the swerve drive subsystem
     }
 
     // Called when the command is initially scheduled
     @Override
     public void initialize() {
+        intialNotePose = null;
+        initalReset = false;
         initialYaw = swerveDrive.getPose().getRotation();
-        Logger.recordOutput("IntakeNOteCommand/initialYaw", initialYaw);
+        Logger.recordOutput("IntakeNoteCommand/initialYaw", initialYaw);
         Logger.recordOutput("IntakeNoteCommand/end", false);
 
         double currentSpeed = Math.sqrt(Math.pow(swerveDrive.getMeasuredFeildRelativeSpeeds().vxMetersPerSecond,2) + 
@@ -86,9 +96,20 @@ public class DriveToNote extends Command {
                                                     Constants.IntakeConstants.KINTAKE_TRANSLATION3D.getZ()); // Create a 3D translation for the intake
 
         Translation2d noteTranslation2d = noteDetector.getNoteFieldRelativePose(); // Get position of detected note
-        
-        if (noteDetector.hasTargets()) { // Check if any targets are detected
-            ChassisSpeeds desiredSpeeds = new ChassisSpeeds(); // Initialize desired speeds object
+        if (noteDetector.hasTargets() && intialNotePose == null) {
+            intialNotePose = noteTranslation2d;
+        }
+
+        if (intialNotePose != null && noteDetector.getNoteFieldRelativePose().getDistance(intialNotePose) <= 0.6 &&
+            (noteDetector.hasTargets() || (noteDetector.getNoteRobotRelativePose().getX() <= 1.1 && noteDetector.getNoteRobotRelativePose().getX() > .6))) { // Check if any targets are detected
+            
+            isRunning = true;
+
+            initalReset = false;
+            Logger.recordOutput("distNoteFromInital", noteDetector.getNoteFieldRelativePose().getDistance(intialNotePose));
+            //penis
+
+            ChassisSpeeds desiredSpeeds = new ChassisSpeeds(0,0,0); // Initialize desired speeds object
             
             // Calculate desired translational speeds using PID controller
             desiredSpeeds.vxMetersPerSecond = 
@@ -96,9 +117,7 @@ public class DriveToNote extends Command {
             desiredSpeeds.vyMetersPerSecond = 
                 m_translationalController.calculate(intakeTranslation3d.getY(), noteTranslation2d.getY());
             
-            double scaler = Math.sqrt(Math.pow(drivingSpeedMps,2)/(Math.pow(desiredSpeeds.vxMetersPerSecond,2) + Math.pow(desiredSpeeds.vyMetersPerSecond,2)));
-            desiredSpeeds.vxMetersPerSecond *= scaler;
-            desiredSpeeds.vyMetersPerSecond *= scaler;
+            desiredSpeeds = RebelUtil.scaleSpeeds(drivingSpeedMps, desiredSpeeds);
             
             double desiredRotation = Math.atan2(
                         swerveDrive.getPose().getY() - noteTranslation2d.getY(), 
@@ -108,14 +127,20 @@ public class DriveToNote extends Command {
 
             desiredSpeeds.omegaRadiansPerSecond =
                 m_rotationalController.calculate(
-                    robotYaw.getRadians(), desiredRotation); // Calculate rotational speed using PID controller
+                    robotYaw.getRadians(), initialYaw.getRadians()); // Calculate rotational speed using PID controller
             
             Logger.recordOutput("IntakeNoteCommand/desiredRotationRad", desiredRotation); // Log desired rotation in radians
             Logger.recordOutput("IntakeNoteCommand/desiredSpeeds", desiredSpeeds); // Log desired speeds
 
             swerveDrive.driveFieldRelative(desiredSpeeds); // Command swerve drive to move with calculated speeds
         }
-        else { 
+        else if (DriverStation.isAutonomous()) { 
+            isRunning = true;
+            
+            if (!initalReset) {
+                initialYaw = swerveDrive.getPose().getRotation();
+                initalReset = true;
+            }
             ChassisSpeeds desiredSpeeds = new ChassisSpeeds(0, 0, 0); // Stop if no targets are detected
 
             if (over) { // If over flag is true, rotate back by -30 degrees from initial yaw
@@ -130,6 +155,7 @@ public class DriveToNote extends Command {
                     m_rotationalController.calculate(robotYaw.getRadians()); // Calculate rotational speed towards goal
                     Logger.recordOutput("IntakeNoteCommand/desiredRotationRad",goal); // Log goal rotation in radians
                 }
+                swerveDrive.driveFieldRelative(desiredSpeeds); // Command swerve drive to move with calculated speeds
             }
             else { // If over flag is false, rotate forward by +30 degrees from initial yaw
                 double goal = initialYaw.getRadians() + Math.toRadians(30);
@@ -138,14 +164,15 @@ public class DriveToNote extends Command {
                 if (m_rotationalController.atGoal()) {
                     over = true; // Toggle over flag if goal is reached
                 }
-                else {
-                    desiredSpeeds.omegaRadiansPerSecond =
-                    m_rotationalController.calculate(robotYaw.getRadians()); // Calculate rotational speed towards goal
-                    Logger.recordOutput("IntakeNoteCommand/desiredRotationRad", goal); // Log goal rotation in radians
-                }
+                desiredSpeeds.omegaRadiansPerSecond =
+                m_rotationalController.calculate(robotYaw.getRadians()); // Calculate rotational speed towards goal
+                Logger.recordOutput("IntakeNoteCommand/desiredRotationRad", goal); // Log goal rotation in radians
+                swerveDrive.driveFieldRelative(desiredSpeeds); // Command swerve drive to move with calculated speeds while rotating
             }
             
-            swerveDrive.driveFieldRelative(desiredSpeeds); // Command swerve drive to move with calculated speeds while rotating
+        }
+        else {
+            isRunning = false;
         }
         
     }
@@ -159,6 +186,11 @@ public class DriveToNote extends Command {
     public void end(boolean interrupted) {
         Logger.recordOutput("IntakeNoteCommand/driveInterrupted", interrupted); // Log whether command was interrupted or finished normally
         Logger.recordOutput("IntakeNoteCommand/end", true); // Log command end status
-        swerveDrive.driveFieldRelative(new ChassisSpeeds(0, 0, 0)); // Stop all movement of the swerve drive at command end
+        // swerveDrive.driveFieldRelative(new ChassisSpeeds(0, 0, 0)); // Stop all movement of the swerve drive at command end
+        isRunning = false;
+        if (!interrupted) {
+            swerveDrive.driveFieldRelative(new ChassisSpeeds(0,0,0));
+        }
+        
     }
 }

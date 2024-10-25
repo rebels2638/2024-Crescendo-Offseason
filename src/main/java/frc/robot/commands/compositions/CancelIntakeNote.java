@@ -16,7 +16,7 @@ public class CancelIntakeNote extends SequentialCommandGroup {
         // Check if both command groups are not null.
         if(c != null && c2 != null) {
             addCommands(
-                new StopDrive(swerveDrive), // Stop the drive subsystem.
+                // new StopDrive(swerveDrive), // Stop the drive subsystem.
                 new InstantCommand(()->c.cancel()), // Cancel the first command group.
                 new InstantCommand(()->c2.cancel()), // Cancel the second command group.
                 new StopIntake(), // Stop the intake subsystem.
@@ -27,7 +27,7 @@ public class CancelIntakeNote extends SequentialCommandGroup {
         // If only the first command group is not null.
         else if(c != null) {
             addCommands(
-                new StopDrive(swerveDrive), // Stop the drive subsystem.
+                // new StopDrive(swerveDrive), // Stop the drive subsystem.
                 new InstantCommand(()->c.cancel()), // Cancel the first command group.
                 new StopIntake(), // Stop the intake subsystem.
                 new PivotTurtle() // Pivot the robot to a turtle position.

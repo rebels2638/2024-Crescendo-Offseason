@@ -73,6 +73,8 @@ public class NoteDetector extends SubsystemBase {
             return inputs.bestNote;
         }
         Pose2d delayedPose = swerveDrive.getPoseAtTimestamp(Timer.getFPGATimestamp() - inputs.totalLatencySeconds);
+        delayedPose = new Pose2d(new Translation2d(Math.abs(delayedPose.getX()), Math.abs(delayedPose.getY())), delayedPose.getRotation());
+        
         Logger.recordOutput("NoteDetector/delayedPose", delayedPose);
 
         double pitch = Math.PI / 2 - (Constants.VisionConstants.kNOTE_DETECTOR_CAMERA_POSE.getRotation().getY() - inputs.tyRadians);
@@ -116,7 +118,6 @@ public class NoteDetector extends SubsystemBase {
 
         // TODO: Fixed sim :skull:
         
-
         return absoluteTranslation2d;
     }
 

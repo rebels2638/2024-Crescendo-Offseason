@@ -9,7 +9,15 @@ import frc.robot.commands.autoAligment.DriveToPose;
 import frc.robot.commands.autoAligment.NotePresent;
 import frc.robot.commands.compositions.IntakeNote;
 import frc.robot.commands.compositions.ShootNoteAuto;
+import frc.robot.commands.drivetrain.DriveToNote;
+import frc.robot.commands.intake.InIntake;
+import frc.robot.commands.intake.OutIntake;
+import frc.robot.commands.intake.RollIntakeIn;
+import frc.robot.commands.intake.RollIntakeInSlow;
+import frc.robot.commands.intake.RollIntakeOut;
+import frc.robot.commands.intake.StopIntake;
 import frc.robot.commands.pivot.PivotToTorus;
+import frc.robot.commands.pivot.PivotTurtle;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
 import frc.robot.subsystems.drivetrain.vision.NoteDetector;
@@ -17,6 +25,7 @@ import frc.robot.subsystems.intakeComp.Intake;
 
 import java.util.ArrayList;
 
+import com.fasterxml.jackson.databind.SequenceWriter;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -28,8 +37,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public final class Autos {
   /** Example static factory for an autonomous command. */
@@ -54,10 +65,27 @@ public final class Autos {
     Pose2d p = PathPlannerPath.fromPathFile("ToMidNoteFromMid").getPreviewStartingHolonomicPose();
     return new SequentialCommandGroup(      
       new InstantCommand(() -> swerveDrive.resetPose(new Pose2d(p.getTranslation(), p.getRotation()/*new Rotation2d(p.getRotation().unaryMinus().getRadians()+Math.PI/2)))*/))),
-      new PivotToTorus(),
+      new ParallelCommandGroup(
+                    new RollIntakeIn(), // Begin rolling the intake in.
+                    new PivotToTorus() // Pivot to the torus position.
+                ),
       AutoBuilder.followPath(PathPlannerPath.fromPathFile("ToMidNoteFromMid")),
-      new IntakeNote(swerveDrive, intake, noteDetector),
-      AutoBuilder.followPath(PathPlannerPath.fromPathFile("FromMidNoteToMid")),
+      new DriveToNote(swerveDrive, Intake.getInstance(), noteDetector),
+      new ParallelCommandGroup(
+        AutoBuilder.followPath(PathPlannerPath.fromPathFile("FromMidNoteToMid")),
+        new SequentialCommandGroup(
+          new StopIntake(), // Stop the intake mechanism.
+                new PivotTurtle(), // Pivot to a turtle position.
+                new RollIntakeOut(), // Roll the intake out.
+                new WaitCommand(0.15), // Wait for 0.15 seconds.
+                new OutIntake(), // Push the object out of the intake.
+                new StopIntake(), // Stop the intake again.
+                new RollIntakeInSlow(), // Slowly roll the intake in.
+                new InIntake(), // Bring the object into the intake.
+                new WaitCommand(0.1), // Wait for 0.1 seconds.
+                new StopIntake()
+        )
+      ),
       AutoBuilder.followPath(PathPlannerPath.fromPathFile("ToSourceNoteFromMid")),
       AutoBuilder.followPath(PathPlannerPath.fromPathFile("FromSourceNoteToMid")),
       AutoBuilder.followPath(PathPlannerPath.fromPathFile("ToAMPNoteFromMidTurn")),

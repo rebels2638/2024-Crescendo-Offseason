@@ -97,20 +97,22 @@ public class SwerveDrive extends SubsystemBase {
     private final SlewRateLimiter vxSlewRateLimiter = 
         new SlewRateLimiter(
             Constants.DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_ACCELERATION_METERS_PER_SECOND_SQUARED, 
-            Constants.DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_DECELERATION_METERS_PER_SECOND_SQUARED,
+            -Constants.DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_DECELERATION_METERS_PER_SECOND_SQUARED,
             0);
     private final SlewRateLimiter vySlewRateLimiter = 
         new SlewRateLimiter(
             Constants.DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_ACCELERATION_METERS_PER_SECOND_SQUARED, 
-            Constants.DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_DECELERATION_METERS_PER_SECOND_SQUARED,
+            -Constants.DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_DECELERATION_METERS_PER_SECOND_SQUARED,
             0);
     private final SlewRateLimiter omegaSlewRateLimiter = 
         new SlewRateLimiter(
             Constants.DrivetrainConstants.kMAX_DRIVETRAIN_ANGULAR_ACCELERATION_RADIANS_PER_SECOND_SQUARED, 
-            Constants.DrivetrainConstants.kMAX_DRIVETRAIN_ANGULAR_DECELERATION_RADIANS_PER_SECOND_SQUARED,
+            -Constants.DrivetrainConstants.kMAX_DRIVETRAIN_ANGULAR_DECELERATION_RADIANS_PER_SECOND_SQUARED,
             0);
     private final SlewRateLimiter[] moduleDriveSlewRateLimiters = new SlewRateLimiter[4];
 
+    private double prevDiscretizationTime = 0;
+    
     public SwerveDrive() {
         switch (Constants.currentMode) {
             case SIM:
@@ -171,7 +173,7 @@ public class SwerveDrive extends SubsystemBase {
             moduleDriveSlewRateLimiters[i] = 
                 new SlewRateLimiter(
                     Constants.DrivetrainConstants.kMAX_MODULE_DRIVE_ACCELERATION_METERS_PER_SECOND, 
-                    Constants.DrivetrainConstants.kMAX_MODULE_DRIVE_DECELERATION_METERS_PER_SECOND,
+                    -Constants.DrivetrainConstants.kMAX_MODULE_DRIVE_DECELERATION_METERS_PER_SECOND,
                     0);
         }
 
@@ -242,34 +244,34 @@ public class SwerveDrive extends SubsystemBase {
             m_poseEstimator.getEstimatedPosition().getTranslation().getY(),
             m_poseEstimator.getEstimatedPosition().getRotation().getRadians()
         });
+        
+        Logger.recordOutput("SwerveDrive/desiredFieldRelativeSpeeds", desiredFieldRelativeSpeeds);
 
-        desiredFieldRelativeSpeeds.vxMetersPerSecond = 
-            RebelUtil.constrain(
-                desiredFieldRelativeSpeeds.vxMetersPerSecond,
-                -DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND);
-        desiredFieldRelativeSpeeds.vyMetersPerSecond = 
-            RebelUtil.constrain(
-                desiredFieldRelativeSpeeds.vyMetersPerSecond,
-                -DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND);
-        desiredFieldRelativeSpeeds.omegaRadiansPerSecond = 
+        ChassisSpeeds scaledSpeeds =
+            RebelUtil.scaleSpeeds(
+                DrivetrainConstants.kMAX_DRIVETRAIN_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
+                desiredFieldRelativeSpeeds);
+        if (Math.abs(scaledSpeeds.vxMetersPerSecond) < Math.abs(desiredFieldRelativeSpeeds.vxMetersPerSecond) ||
+            Math.abs(scaledSpeeds.vyMetersPerSecond) < Math.abs(desiredFieldRelativeSpeeds.vyMetersPerSecond)) {
+            desiredFieldRelativeSpeeds = scaledSpeeds;
+        }
+
+        Logger.recordOutput("SwerveDrive/scaledFieldRelativeSpeeds", scaledSpeeds);
+
+        desiredFieldRelativeSpeeds.omegaRadiansPerSecond =
             RebelUtil.constrain(
                 desiredFieldRelativeSpeeds.omegaRadiansPerSecond,
                 -DrivetrainConstants.kMAX_DRIVETRAIN_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
                 DrivetrainConstants.kMAX_DRIVETRAIN_ANGULAR_VELOCITY_RADIANS_PER_SECOND);
 
-        desiredFieldRelativeSpeeds.vxMetersPerSecond = vxSlewRateLimiter.calculate(desiredFieldRelativeSpeeds.vxMetersPerSecond);
-        desiredFieldRelativeSpeeds.vyMetersPerSecond = vySlewRateLimiter.calculate(desiredFieldRelativeSpeeds.vyMetersPerSecond);
-        desiredFieldRelativeSpeeds.omegaRadiansPerSecond = omegaSlewRateLimiter.calculate(desiredFieldRelativeSpeeds.omegaRadiansPerSecond);
+        desiredFieldRelativeSpeeds.vxMetersPerSecond = Math.signum(desiredFieldRelativeSpeeds.vxMetersPerSecond) * vxSlewRateLimiter.calculate(Math.abs(desiredFieldRelativeSpeeds.vxMetersPerSecond));
+        desiredFieldRelativeSpeeds.vyMetersPerSecond = Math.signum(desiredFieldRelativeSpeeds.vyMetersPerSecond) * vySlewRateLimiter.calculate(Math.abs(desiredFieldRelativeSpeeds.vyMetersPerSecond));
+        desiredFieldRelativeSpeeds.omegaRadiansPerSecond = Math.signum(desiredFieldRelativeSpeeds.omegaRadiansPerSecond) * omegaSlewRateLimiter.calculate(Math.abs(desiredFieldRelativeSpeeds.omegaRadiansPerSecond));
 
         desiredRobotRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(desiredFieldRelativeSpeeds, getPose().getRotation());
         Logger.recordOutput("SwerveDrive/desiredRobotRelativeSpeeds", desiredRobotRelativeSpeeds);
         Logger.recordOutput("SwerveDrive/measuredRobotRelativeSpeeds", measuredRobotRelativeSpeeds);
-        Logger.recordOutput("SwerveDrive/desiredFieldRelativeSpeeds", desiredFieldRelativeSpeeds);
         Logger.recordOutput("SwerveDrive/measuredFieldRelativeSpeeds", measuredFieldRelativeSpeeds);
-
-
         
         double estimatedVyDriftMetersPerSecond = driveFFController.calculate(desiredFieldRelativeSpeeds.vxMetersPerSecond, desiredFieldRelativeSpeeds.omegaRadiansPerSecond);
         double estimatedVxDriftMetersPerSecond = driveFFController.calculate(desiredFieldRelativeSpeeds.vyMetersPerSecond, desiredFieldRelativeSpeeds.omegaRadiansPerSecond);
@@ -294,19 +296,22 @@ public class SwerveDrive extends SubsystemBase {
         } 
 
         SwerveModuleState[] desiredModuleStates = m_kinematics.toSwerveModuleStates(correctedSpeeds);
-        
+        double discretizationTime = Timer.getFPGATimestamp();
+        ChassisSpeeds.discretize(correctedSpeeds, discretizationTime - prevDiscretizationTime);
+        prevDiscretizationTime = discretizationTime;
 
         for (int i = 0; i < 4; i++) {
-            Logger.recordOutput("SwerveDrive/unoptimizedDesiredModuleStates", desiredModuleStates);
-
             desiredModuleStates[i] = SwerveModuleState.optimize(desiredModuleStates[i], measuredModuleStates[i].angle);
-            desiredModuleStates[i].speedMetersPerSecond = 
+            desiredModuleStates[i].speedMetersPerSecond =
                 RebelUtil.constrain(
                     desiredModuleStates[i].speedMetersPerSecond, 
                     -DrivetrainConstants.kMAX_MODULE_DRIVE_VELOCITY_METERS_PER_SECOND, 
                     DrivetrainConstants.kMAX_MODULE_DRIVE_VELOCITY_METERS_PER_SECOND);
-            desiredModuleStates[i].speedMetersPerSecond = moduleDriveSlewRateLimiters[i].calculate(desiredModuleStates[i].speedMetersPerSecond);
+            desiredModuleStates[i].speedMetersPerSecond = Math.signum(desiredModuleStates[i].speedMetersPerSecond) * moduleDriveSlewRateLimiters[i].calculate(Math.abs(desiredModuleStates[i].speedMetersPerSecond));
             modules[i].setState(desiredModuleStates[i]);
+            
+            Logger.recordOutput("SwerveDrive/unoptimizedDesiredModuleStates", desiredModuleStates);
+
         }
 
         Logger.recordOutput("SwerveDrive/desiredModuleStates", desiredModuleStates);

@@ -4,19 +4,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.shooterComp.Shooter;
 
-public class ShooterStop extends Command {
-    // private double velocitySetPoint = 0;
+public class ShooterAmp extends Command {
+    
+    private double topVelo = 10;
+    private double bottomVelo = 60;
     private final Shooter shooterSubsystem = Shooter.getInstance();
-
-    public ShooterStop(){
-    }
-    public ShooterStop(SequentialCommandGroup s){
-        s.cancel();
-    }
 
     @Override
     public void initialize(){
-        shooterSubsystem.setVelocityRadSec(0,false, 0, 0);
+        shooterSubsystem.setVelocityRadSec(0, true, bottomVelo, topVelo);
     }
 
     @Override

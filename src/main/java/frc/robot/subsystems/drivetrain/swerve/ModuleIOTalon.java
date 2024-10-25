@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drivetrain.swerve;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -10,8 +12,10 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.lib.util.RebelUtil;
 
@@ -20,11 +24,11 @@ public class ModuleIOTalon implements ModuleIO {
     private TalonFX m_angle;
     private TalonFX m_drive;
     
-    private final PIDController m_angleFeedbackController = new PIDController(6, 0.0, 0.01);
-    private final PIDController m_driveFeedbackController = new PIDController(2, 0, 0);
+    private final PIDController m_angleFeedbackController = new PIDController(4.5, 1, 0.043, .315); // 6 0 .01 //3, 0.0, 0.02
+    private final PIDController m_driveFeedbackController = new PIDController(0, 0, 0); // 2 0 0
 
-    private final SimpleMotorFeedforward m_angleFeedforward = new SimpleMotorFeedforward(.23, 0.0000); // .23
-    private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0.22, 2.16); // 0.22 2.16 0
+    private final SimpleMotorFeedforward m_angleFeedforward = new SimpleMotorFeedforward(0.23, 0.06); // .23
+    private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0.22, 2.2, 0.09); // 0.22 2.16 0
     
     private double m_angleVoltage = 0;
 
@@ -37,6 +41,8 @@ public class ModuleIOTalon implements ModuleIO {
 
     private CANcoder angleEncoder;
     private boolean syncQueued = false;
+    private double prevTime = 0;
+    private double prevVelocity = 0;
 
     public ModuleIOTalon(int id) {
         CANcoderConfiguration endocerConfig = new CANcoderConfiguration();
@@ -93,9 +99,10 @@ public class ModuleIOTalon implements ModuleIO {
         m_angle.setNeutralMode(NeutralModeValue.Brake);
         m_drive.setNeutralMode(NeutralModeValue.Brake);
 
-        
+        m_angleFeedbackController.setTolerance(Math.toRadians(4));
+        m_angleFeedbackController.setIZone(Math.toRadians(35));
 
-        m_angleFeedbackController.setTolerance(Math.toRadians(2));
+        // m_angleFeedbackController.setIntegratorRange(0);
         m_driveFeedbackController.setTolerance(0.1);
 
         m_angleFeedbackController.enableContinuousInput(0, 2 * Math.PI);
@@ -117,7 +124,7 @@ public class ModuleIOTalon implements ModuleIO {
         anglePositionRad = m_angle.getPosition().getValueAsDouble() * 2 * Math.PI * Constants.DrivetrainConstants.kANGLE_MOTOR_TO_OUTPUT_SHAFT_RATIO;
         drivePositionsMeters = m_drive.getPosition().getValueAsDouble() * 2 * Math.PI * Constants.DrivetrainConstants.kDRIVE_WHEEL_RADIUS_METERS * Constants.DrivetrainConstants.kDRIVE_MOTOR_TO_OUTPUT_SHAFT_RATIO;
 
-        inputs.absEncoderRad = (angleEncoder.getPosition().getValueAsDouble() * Math.PI * 2);
+        inputs.absEncoderRad = (angleEncoder.getPosition().getValueAsDouble() * Math.PI * 2) % (Math.PI * 2);
 
         anglePositionRad = inputs.absEncoderRad;
 
@@ -141,7 +148,11 @@ public class ModuleIOTalon implements ModuleIO {
 
         double speed = state.speedMetersPerSecond;
         m_driveVoltage = m_driveFeedbackController.calculate(driveVelocityMps, speed);
-        m_driveVoltage += m_driveFeedforward.calculate(speed, Math.signum(m_driveVoltage));
+        m_driveVoltage += m_driveFeedforward.calculate(
+            driveVelocityMps, 
+            state.speedMetersPerSecond, 
+            (Timer.getFPGATimestamp() - prevTime));
+        
 
         m_driveVoltage = RebelUtil.constrain(
                          m_driveVoltage, -Constants.DrivetrainConstants.kMAX_DRIVE_VOLTAGE,
@@ -154,17 +165,29 @@ public class ModuleIOTalon implements ModuleIO {
             syncQueued = false;
         }
 
-        double angle = state.angle.getRadians();
+        double desiredAngle = state.angle.getRadians();
 
-        m_angleVoltage = m_angleFeedbackController.calculate(anglePositionRad, angle);
-        m_angleVoltage += m_angleFeedforward.calculate(angle - anglePositionRad, Math.signum(m_angleVoltage)); // TODO: this is scuffed
+        m_angleVoltage = m_angleFeedbackController.calculate(anglePositionRad, desiredAngle);
+        
+        double deltaTheta = desiredAngle - anglePositionRad;
+        if (deltaTheta < -Math.PI) {
+            deltaTheta = Math.PI * 2 + deltaTheta; 
+        }
+        else if (deltaTheta > Math.PI) {
+            deltaTheta = Math.PI * 2 - deltaTheta;
+        }
+        Logger.recordOutput("SwerveDrive/deltaTheta", deltaTheta);
+        double velocityRadSec = (deltaTheta) / (Timer.getFPGATimestamp() - prevTime);
+        Logger.recordOutput("SwerveDrive/velocityRadSec", velocityRadSec);
+        m_angleVoltage += m_angleFeedforward.calculate(velocityRadSec, Math.signum(m_angleVoltage)); // TODO: this is scuffed
                          
-
         m_angleVoltage = RebelUtil.constrain(
                          m_angleVoltage, -Constants.DrivetrainConstants.kMAX_ANGLE_VOLTAGE,
                          Constants.DrivetrainConstants.kMAX_ANGLE_VOLTAGE);
 
         m_angle.setVoltage(m_angleVoltage);
+
+        prevTime = Timer.getFPGATimestamp();
     }
 
     @Override
@@ -173,3 +196,4 @@ public class ModuleIOTalon implements ModuleIO {
         m_drive.setPosition(0);
     }
 }
+

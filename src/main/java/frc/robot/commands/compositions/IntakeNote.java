@@ -1,5 +1,8 @@
 package frc.robot.commands.compositions;
 
+import java.time.Instant;
+
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup; // Group for running commands in parallel.
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup; // Group for executing commands in sequence.
 import edu.wpi.first.wpilibj2.command.WaitCommand; // Command that pauses execution for a specified time.
@@ -44,6 +47,7 @@ public class IntakeNote extends SequentialCommandGroup {
                     new RollIntakeIn(), // Begin rolling the intake in.
                     new PivotToTorus() // Pivot to the torus position.
                 ),
+                new WaitCommand(.5),
                 // Drive to the detected note.
                 new DriveToNote(swerveDrive, intakeSubsystem, noteDetector),
                 new StopIntake(), // Stop the intake mechanism.

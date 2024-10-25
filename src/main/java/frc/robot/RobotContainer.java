@@ -33,6 +33,7 @@ import frc.robot.commands.intake.RollIntakeEject;
 import frc.robot.commands.intake.RollIntakeIn;
 import frc.robot.commands.intake.StopIntake;
 import frc.robot.commands.pivot.PivotToTorus;
+import frc.robot.commands.shooterComp.ShooterAmp;
 import frc.robot.commands.shooterComp.ShooterStop;
 import frc.robot.commands.shooterComp.ShooterWindReverse;
 import frc.robot.commands.shooterComp.ShooterWindup;
@@ -164,6 +165,7 @@ public class RobotContainer {
     () -> -MathUtil.applyDeadband(xboxDriver.getRightX(), Constants.OperatorConstants.RIGHT_X_DEADBAND)));
     
     this.xboxOperator.getRightBumper().onTrue(new ShooterWindup());
+    // this.xboxOperator.getRightBumper().onTrue(new ShooterAmp());
     this.xboxOperator.getXButton().onTrue(new MoveElevatorToggle());
     this.xboxOperator.getYButton().onTrue(new ScoreAMP()); // changed
     this.xboxOperator.getAButton().onTrue(new ShootNoteTele()); // change back to shootNoteTele
@@ -175,8 +177,9 @@ public class RobotContainer {
 
     // driver controlls
     this.xboxDriver.getXButton().onTrue(new InstantCommand(() -> swerveDrive.zeroGyro()));
-    // this.xboxDriver.getLeftBumper().onTrue(new IntakeNote(swerveDrive, intake, noteDetector));
-    this.xboxDriver.getLeftBumper().onTrue(new IntakeNoteManual());
+    this.xboxDriver.getLeftBumper().onTrue(new IntakeNoteAuto());
+
+    // this.xboxDriver.getLeftBumper().onTrue(new IntakeNoteManual());
 
     this.xboxDriver.getRightMiddleButton().onTrue(new RollIntakeEject());
     this.xboxDriver.getRightBumper().onTrue(new CancelIntakeNote(intakeG, feedHold, swerveDrive));
