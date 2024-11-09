@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.AutoRunner;
 import frc.robot.commands.autoAligment.DriveToPose;
 import frc.robot.commands.autoAligment.NotePresent;
+import frc.robot.commands.climber.MoveClimberDown;
+import frc.robot.commands.climber.MoveClimberUp;
 import frc.robot.commands.compositions.CancelIntakeNote;
 import frc.robot.commands.compositions.FeedAndHoldNote;
 import frc.robot.commands.compositions.IntakeNote;
@@ -37,8 +39,13 @@ import frc.robot.commands.shooterComp.ShooterAmp;
 import frc.robot.commands.shooterComp.ShooterStop;
 import frc.robot.commands.shooterComp.ShooterWindReverse;
 import frc.robot.commands.shooterComp.ShooterWindup;
+import frc.robot.commands.shooterComp.ShooterWindupAuto;
 import frc.robot.commands.shooterComp.ShooterWindupLob;
 import frc.robot.lib.input.XboxController;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberIO;
+import frc.robot.subsystems.climber.ClimberIOFalcon;
+import frc.robot.subsystems.climber.ClimberIOSim;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
 import frc.robot.subsystems.drivetrain.vision.NoteDetector;
 import frc.robot.subsystems.elevator.Elevator;
@@ -54,6 +61,7 @@ import frc.robot.subsystems.pivotComp.Pivot;
 import frc.robot.subsystems.pivotComp.PivotIO;
 import frc.robot.subsystems.pivotComp.PivotIONeo;
 import frc.robot.subsystems.pivotComp.PivotIOSim;
+import frc.robot.subsystems.poseLimelight.PoseLimelight;
 // import frc.robot.subsystems.shooter.pivot.flywheel.Flywheel;
 import frc.robot.subsystems.shooterComp.Shooter;
 import frc.robot.subsystems.shooterComp.ShooterIO;
@@ -84,13 +92,16 @@ public class RobotContainer {
 
   private final Shooter shooter;
 
+  private final PoseLimelight poseLimelight;
+  // private final Climber climberSubsystem;
 
   public RobotContainer() {
     this.xboxTester = new XboxController(1);
     this.xboxOperator = new XboxController(2);
     this.xboxDriver = new XboxController(3);
 
-    swerveDrive = new SwerveDrive();
+    poseLimelight = new PoseLimelight();
+    swerveDrive = new SwerveDrive(poseLimelight); //TODO: change null later :(
     // flywheelSubsystem = new Flywheel();
     noteDetector = new NoteDetector(swerveDrive);
     indexer = new Indexer(swerveDrive, noteDetector);
@@ -101,6 +112,7 @@ public class RobotContainer {
         intake = Intake.setInstance(new Intake(new IntakeIOSim(indexer))); //Assigns the instance object(pointer) to the variable so no new changes are needed.
         shooter = Shooter.setInstance(new Shooter(new ShooterIOSim(indexer)));
         elevator = Elevator.setInstance(new Elevator(new ElevatorIOSim()));
+        // climberSubsystem = Climber.setInstance(new Climber(new ClimberIOSim()));
 
         break;
     
@@ -109,6 +121,7 @@ public class RobotContainer {
         pivot = Pivot.setInstance(new Pivot(new PivotIONeo()));
         shooter = Shooter.setInstance(new Shooter(new ShooterIONeo(indexer)));
         elevator = Elevator.setInstance(new Elevator(new ElevatorIOFalcon()));
+        // climberSubsystem = Climber.setInstance(new Climber(new ClimberIO(){}));
 
         break;
 
@@ -117,6 +130,7 @@ public class RobotContainer {
         intake = Intake.setInstance(new Intake(new IntakeIO(){}));
         shooter = Shooter.setInstance(new Shooter(new ShooterIO(){}));
         elevator = Elevator.setInstance(new Elevator(new ElevatorIO(){}));  
+        // climberSubsystem = Climber.setInstance(new Climber(new ClimberIOFalcon()));
 
         break;
     }
@@ -130,11 +144,11 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("MoveElevatorAMP", new MoveElevatorAMP());
     NamedCommands.registerCommand("MoveElevatorTurtle", new MoveElevatorTurtle());
-    NamedCommands.registerCommand("ShooterWindUp", new ShooterWindup());
+    NamedCommands.registerCommand("ShooterWindUp", new ShooterWindupAuto());
     NamedCommands.registerCommand("RollIntakeIn", new RollIntakeIn());
     NamedCommands.registerCommand("RollIntakeEject", new RollIntakeEject());
     NamedCommands.registerCommand("StopIntake", new StopIntake());
-    NamedCommands.registerCommand("IntakeNote", new IntakeNote(swerveDrive, intake, noteDetector));
+    NamedCommands.registerCommand("IntakeNote", new IntakeNoteAuto());
     NamedCommands.registerCommand("ShooterStop", new ShooterStop());
     NamedCommands.registerCommand("ShooterWindReverse", new ShooterWindReverse());
     NamedCommands.registerCommand("ShootNote", new ShootNote());
@@ -159,10 +173,7 @@ public class RobotContainer {
     // OP Controlls
     SequentialCommandGroup intakeG, feedHold;
     intakeG = null;
-    swerveDrive.setDefaultCommand(new AbsoluteFieldDrive(swerveDrive, 
-    () -> -MathUtil.applyDeadband(xboxDriver.getLeftY(), Constants.OperatorConstants.LEFT_Y_DEADBAND),
-    () -> -MathUtil.applyDeadband(xboxDriver.getLeftX(), Constants.OperatorConstants.LEFT_X_DEADBAND),
-    () -> -MathUtil.applyDeadband(xboxDriver.getRightX(), Constants.OperatorConstants.RIGHT_X_DEADBAND)));
+    swerveDrive.setDefaultCommand(new AbsoluteFieldDrive(swerveDrive, xboxDriver));
     
     this.xboxOperator.getRightBumper().onTrue(new ShooterWindup());
     // this.xboxOperator.getRightBumper().onTrue(new ShooterAmp());
@@ -177,9 +188,12 @@ public class RobotContainer {
 
     // driver controlls
     this.xboxDriver.getXButton().onTrue(new InstantCommand(() -> swerveDrive.zeroGyro()));
-    this.xboxDriver.getLeftBumper().onTrue(new IntakeNoteAuto());
+    this.xboxDriver.getAButton().onTrue(intakeG = new IntakeNote(swerveDrive, intake, noteDetector));
+    
+    // this.xboxDriver.getBButton().onTrue(new MoveClimberUp());
+    // this.xboxDriver.getAButton().onTrue(new MoveClimberDown());
 
-    // this.xboxDriver.getLeftBumper().onTrue(new IntakeNoteManual());
+    this.xboxDriver.getLeftBumper().onTrue(intakeG = new IntakeNoteManual()); //TODO: CHECK W KUSH
 
     this.xboxDriver.getRightMiddleButton().onTrue(new RollIntakeEject());
     this.xboxDriver.getRightBumper().onTrue(new CancelIntakeNote(intakeG, feedHold, swerveDrive));

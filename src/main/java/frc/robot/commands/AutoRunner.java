@@ -103,10 +103,10 @@ public class AutoRunner {
         //2.5PAmpA1
         //3PAmpA2 << FAR 2
         pathChosen = "4PMidMASScoreTurn";
-        // return new PathPlannerAuto(pathChosen);
+        return new PathPlannerAuto(pathChosen);
         // return Autos.Far1(swerveDrive, intake, noteDetector);
         // return Autos.configAuto(swerveDrive);
-        return Autos.fourPeiceMid(swerveDrive, intake, noteDetector);
+        // return Autos.fourPeiceMid(swerveDrive, intake, noteDetector);
     }
 
     public String getSelectedAutoName() {

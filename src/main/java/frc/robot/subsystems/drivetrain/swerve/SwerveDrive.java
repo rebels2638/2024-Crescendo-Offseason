@@ -9,7 +9,9 @@ import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -32,7 +34,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import frc.robot.Constants;
 import frc.robot.Constants.DrivetrainConstants;
+import frc.robot.lib.util.LimelightHelpers;
 import frc.robot.lib.util.RebelUtil;
+import frc.robot.subsystems.poseLimelight.PoseLimelight;
 
 public class SwerveDrive extends SubsystemBase {
 
@@ -112,8 +116,13 @@ public class SwerveDrive extends SubsystemBase {
     private final SlewRateLimiter[] moduleDriveSlewRateLimiters = new SlewRateLimiter[4];
 
     private double prevDiscretizationTime = 0;
+    private double prevGyroTime = 0;
+    private double prevGyroYawDeg = 0;
     
-    public SwerveDrive() {
+    private final PoseLimelight poseLimelight;
+    public SwerveDrive(PoseLimelight poseLimelight) {
+        this.poseLimelight = poseLimelight;
+
         switch (Constants.currentMode) {
             case SIM:
                 modules = new ModuleIO[] {
@@ -230,6 +239,21 @@ public class SwerveDrive extends SubsystemBase {
             new SwerveModulePosition(moduleInputs[3].drivePositionMeters, new Rotation2d(moduleInputs[3].anglePositionRad))
         });
 
+
+        //TODO: THIS SHOULD BE BEFORE THE NT CALL INSIDE OF THE LIMELIGHT SUBSYSTEM. MOST LIKELY NO DIFFRENCE AS THIS IS THE RATE THAT POSE ESTIM UPDATES A
+        // TODO: CHECK UNITS FOR THE REST OF THIS MEATHOD?!!?!?!?! 0,0,00,0,00, idk whhat units aojsnd awijfevkb c'wekfadszx
+        LimelightHelpers.SetRobotOrientation("limelight-tag", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+
+        // // TODO: add a queue for the gyro velocities to sync w the target delay - this is like a minor optimization
+        if (poseLimelight.hasValidTargets() /*&& Math.abs((yaw.getDegrees() - prevGyroYawDeg)/(Timer.getFPGATimestamp() - prevGyroTime)) <= 180*/) {
+            m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+
+            m_poseEstimator.addVisionMeasurement(poseLimelight.getEstimatedRobotPose(), poseLimelight.getTimestampSeconds());
+        }
+
+        prevGyroYawDeg = yaw.getDegrees();
+        prevGyroTime = Timer.getFPGATimestamp();
+
         measuredRobotRelativeSpeeds = m_kinematics.toChassisSpeeds(
             measuredModuleStates[0],
             measuredModuleStates[1],
@@ -339,8 +363,9 @@ public class SwerveDrive extends SubsystemBase {
         // } 
 
         yaw = pose.getRotation();
-        Logger.recordOutput("INtialYAW", yaw.getDegrees());
-        m_poseEstimator.resetPosition(gyroInputs.yaw, positions, pose);
+        Logger.recordOutput("IntialYAW", yaw.getDegrees());
+        m_poseEstimator.resetPosition(gyroInputs.yaw, positions, pose); // TODO change this from gyroIO to yaw
+
         odometryLock.unlock();
     }
 

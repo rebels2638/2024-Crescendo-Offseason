@@ -7,6 +7,8 @@ package frc.robot;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.rlog.RLOGServer;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,7 +40,8 @@ public class Robot extends LoggedRobot {
     switch (Constants.currentMode) {
     // Running on a real robot, log to a USB stick
     case REAL:
-      // Logger.addDataReceiver(new WPILOGWriter("D:/"));
+      Logger.addDataReceiver(new WPILOGWriter());
+      // Logger.addDataReceiver(new RLOGServer());
       Logger.addDataReceiver(new NT4Publisher());
       break;
 

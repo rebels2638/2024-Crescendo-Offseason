@@ -101,7 +101,8 @@ public class DriveToNote extends Command {
         }
 
         if (intialNotePose != null && noteDetector.getNoteFieldRelativePose().getDistance(intialNotePose) <= 0.6 &&
-            (noteDetector.hasTargets() || (noteDetector.getNoteRobotRelativePose().getX() <= 1.1 && noteDetector.getNoteRobotRelativePose().getX() > .6))) { // Check if any targets are detected
+            (noteDetector.hasTargets() || (noteDetector.getNoteRobotRelativePose().getX() <= 1.1 && noteDetector.getNoteRobotRelativePose().getX() > .6)) /*&&
+            swerveDrive.getPose().getTranslation().getDistance(noteTranslation2d) <= 3*/) { // Check if any targets are detected //TODO: CHECK THIS
             
             isRunning = true;
 
@@ -119,6 +120,9 @@ public class DriveToNote extends Command {
             
             desiredSpeeds = RebelUtil.scaleSpeeds(drivingSpeedMps, desiredSpeeds);
             
+            // double desiredRotation = (Math.atan2(
+            //             swerveDrive.getPose().getY() - noteTranslation2d.getY(), 
+            //             swerveDrive.getPose().getX() - noteTranslation2d.getX()) + 450) % 360; // Calculate desired rotation towards the note
             double desiredRotation = Math.atan2(
                         swerveDrive.getPose().getY() - noteTranslation2d.getY(), 
                         swerveDrive.getPose().getX() - noteTranslation2d.getX()); // Calculate desired rotation towards the note

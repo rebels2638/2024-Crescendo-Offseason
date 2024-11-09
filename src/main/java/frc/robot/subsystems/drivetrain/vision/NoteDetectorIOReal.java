@@ -9,7 +9,7 @@ public class NoteDetectorIOReal implements NoteDetectorIO {
     private static final Debouncer debouncer = new Debouncer(0.2);
 
     public NoteDetectorIOReal() {
-        llTable = NetworkTableInstance.getDefault().getTable("limelight");
+        llTable = NetworkTableInstance.getDefault().getTable("limelight-note");
 
     }
     public void updateInputs(NoteDetectorIOInputs inputs) {

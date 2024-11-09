@@ -73,7 +73,7 @@ public class NoteDetector extends SubsystemBase {
             return inputs.bestNote;
         }
         Pose2d delayedPose = swerveDrive.getPoseAtTimestamp(Timer.getFPGATimestamp() - inputs.totalLatencySeconds);
-        delayedPose = new Pose2d(new Translation2d(Math.abs(delayedPose.getX()), Math.abs(delayedPose.getY())), delayedPose.getRotation());
+        // delayedPose = new Pose2d(new Translation2d(Math.abs(delayedPose.getX()), Math.abs(delayedPose.getY())), delayedPose.getRotation());
         
         Logger.recordOutput("NoteDetector/delayedPose", delayedPose);
 

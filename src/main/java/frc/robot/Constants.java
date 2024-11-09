@@ -52,19 +52,19 @@ public final class Constants {
   public static final class Auton
   {
 
-    public static final PIDConstants TRANSLATION_PID_CONFIG = new PIDConstants(3, 0, 0);
-    public static final PIDConstants ANGLE_PID_CONFIG = new PIDConstants(6.5, 0, 0.03, Math.PI * 2 * .12); 
+    public static final PIDConstants TRANSLATION_PID_CONFIG = new PIDConstants(3.8, 0, 0);
+    public static final PIDConstants ANGLE_PID_CONFIG = new PIDConstants(5, 0, 0.03, Math.PI * 2 * .12); 
 
     public static final double MAX_MODULE_SPEED = 4.5;
-    public static final double MAX_ACCELERATION = 2;
-    public static final double MAX_ANGULAR_VELO_RPS = 0.6; // 1
-    public static final double MAX_ANGULAR_ACCEL_RPS_SQUARED = 1; // 0.5
+    public static final double MAX_ACCELERATION = 3.5;
+    public static final double MAX_ANGULAR_VELO_RPS = 0.6; 
+    public static final double MAX_ANGULAR_ACCEL_RPS_SQUARED = 7; 
 
     public static final HolonomicPathFollowerConfig DRIVE_CONTROLLER_CONFIG = new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
                         Constants.Auton.TRANSLATION_PID_CONFIG, // Translation PID constants
                         Constants.Auton.ANGLE_PID_CONFIG, // Rotation PID constants
                         Constants.Auton.MAX_MODULE_SPEED, // Max module speed, in m/s
-                        // I LOVE THE PYTHAGPREAN THEOREM
+                        // I LOVE THE PYTHAGOREAN THEOREM
                         0.5384061785684372, // Drive base radius in meters. Distance from robot center to furthest module.
                         new ReplanningConfig() // Default path replanning config. See the API for the options here
     );
@@ -72,7 +72,7 @@ public final class Constants {
   }
 
   public static class DrivetrainConstants {
-    // TODO: CHANGE THEESEANDKJANSDKLJWENF LKJDSBLGKJFNadzs
+    // TODO: change these pls :3
     public static final double kMAX_DRIVETRAIN_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND = 4;
     public static final double kMAX_DRIVETRAIN_TRANSLATIONAL_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.5;
     public static final double kMAX_DRIVETRAIN_TRANSLATIONAL_DECELERATION_METERS_PER_SECOND_SQUARED = 7;
@@ -127,7 +127,7 @@ public final class Constants {
     //   new Pose3d(new Translation3d(-0.15, -0.47,  0.7), new Rotation3d(Math.toRadians(0), Math.toRadians(30), Math.toRadians(5)));
     
     public static final Pose3d kNOTE_DETECTOR_CAMERA_POSE = // SIM
-      new Pose3d(new Translation3d(0.076, 0.0,  0.47), new Rotation3d(Math.toRadians(0), Math.toRadians(15.5), Math.toRadians(0)));
+      new Pose3d(new Translation3d(0.076, 0.0,  0.47), new Rotation3d(Math.toRadians(0), Math.toRadians(13), Math.toRadians(0)));
     public static final double kNOTE_DETECTOR_CAMERA_FOV_X_RAD = Math.toRadians(29.8 * 2);
     public static final double kNOTE_DETECTOR_CAMERA_FOV_Y_RAD = Math.toRadians(24.85 * 2);
     public static final double kNOTE_DETECTOR_CAMERA_MAX_RANGE_METERS = 2;
