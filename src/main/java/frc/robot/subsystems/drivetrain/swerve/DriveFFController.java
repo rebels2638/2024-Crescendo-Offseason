@@ -85,8 +85,6 @@ public class DriveFFController {
                 temp.remove(index); 
             }
         }
-            
-    
         
         double[] tr, tl, br, bl;
         tr = new double[] {-Integer.MAX_VALUE, -Integer.MAX_VALUE, 0};

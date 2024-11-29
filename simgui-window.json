@@ -10,8 +10,8 @@
       "style": "0",
       "userScale": "2",
       "width": "1280",
-      "xpos": "110",
-      "ypos": "685"
+      "xpos": "103",
+      "ypos": "393"
     }
   },
   "Window": {
@@ -24,6 +24,11 @@
       "Collapsed": "0",
       "Pos": "250,465",
       "Size": "796,73"
+    },
+    "###Keyboard 3 Settings": {
+      "Collapsed": "0",
+      "Pos": "940,50",
+      "Size": "300,560"
     },
     "###NetworkTables": {
       "Collapsed": "0",

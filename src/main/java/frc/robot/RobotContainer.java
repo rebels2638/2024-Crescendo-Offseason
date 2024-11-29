@@ -6,6 +6,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -57,6 +59,8 @@ import frc.robot.subsystems.intakeComp.Intake;
 import frc.robot.subsystems.intakeComp.IntakeIO;
 import frc.robot.subsystems.intakeComp.IntakeIONeo;
 import frc.robot.subsystems.intakeComp.IntakeIOSim;
+import frc.robot.subsystems.noteVisulaizer.NoteVisualizer;
+import frc.robot.subsystems.noteVisulaizer.NoteVisualizer.Note;
 import frc.robot.subsystems.pivotComp.Pivot;
 import frc.robot.subsystems.pivotComp.PivotIO;
 import frc.robot.subsystems.pivotComp.PivotIONeo;
@@ -92,7 +96,9 @@ public class RobotContainer {
 
   private final Shooter shooter;
 
-  private final PoseLimelight poseLimelight;
+  // private final PoseLimelight poseLimelight;
+
+  public final NoteVisualizer noteVisualizer;
   // private final Climber climberSubsystem;
 
   public RobotContainer() {
@@ -100,8 +106,8 @@ public class RobotContainer {
     this.xboxOperator = new XboxController(2);
     this.xboxDriver = new XboxController(3);
 
-    poseLimelight = new PoseLimelight();
-    swerveDrive = new SwerveDrive(poseLimelight); //TODO: change null later :(
+    // poseLimelight = new PoseLimelight();
+    swerveDrive = new SwerveDrive(/*poseLimelight*/); //TODO: change null later :(
     // flywheelSubsystem = new Flywheel();
     noteDetector = new NoteDetector(swerveDrive);
     indexer = new Indexer(swerveDrive, noteDetector);
@@ -138,7 +144,7 @@ public class RobotContainer {
 
     // intake = new Intake(indexer);
     indexer.setSubsystem(intake, pivot);
-
+    noteVisualizer = new NoteVisualizer();
 
     autoRunner = new AutoRunner(swerveDrive);
 
@@ -179,7 +185,27 @@ public class RobotContainer {
     // this.xboxOperator.getRightBumper().onTrue(new ShooterAmp());
     this.xboxOperator.getXButton().onTrue(new MoveElevatorToggle());
     this.xboxOperator.getYButton().onTrue(new ScoreAMP()); // changed
-    this.xboxOperator.getAButton().onTrue(new ShootNoteTele()); // change back to shootNoteTele
+
+    this.xboxOperator.getAButton().onTrue(
+      //co author as daniel :3
+      new ParallelCommandGroup(
+        new ShootNoteTele(),
+        new InstantCommand(() -> noteVisualizer.addNote(
+          new Note(
+            Timer.getFPGATimestamp(), 
+            new Translation3d(
+              swerveDrive.getPose().getTranslation().getX(),
+              swerveDrive.getPose().getTranslation().getY(),
+              .7
+            ), 
+            swerveDrive.getPose().getRotation().getRadians(), 
+            .5, 
+            10,
+            swerveDrive.getMeasuredFeildRelativeSpeeds().vxMetersPerSecond,
+            swerveDrive.getMeasuredFeildRelativeSpeeds().vyMetersPerSecond)
+          ))
+      )); // change back to shootNoteTele
+
     this.xboxOperator.getBButton().onTrue(feedHold = new FeedAndHoldNote());  
     this.xboxOperator.getLeftBumper().onTrue(new ShooterStop(feedHold));
     // this.xboxOperator.getRightMiddleButton().onTrue(new ParallelCommandGroup(new MoveElevatorAMP(), new IntakeNote()));
@@ -188,12 +214,18 @@ public class RobotContainer {
 
     // driver controlls
     this.xboxDriver.getXButton().onTrue(new InstantCommand(() -> swerveDrive.zeroGyro()));
-    this.xboxDriver.getAButton().onTrue(intakeG = new IntakeNote(swerveDrive, intake, noteDetector));
+    this.xboxDriver.getLeftBumper().onTrue(intakeG = new IntakeNote(swerveDrive, intake, noteDetector));
     
+    this.xboxDriver.getAButton().whileTrue(
+      // swerveDrive.getPose().getTranslation().getDistance(Constants.FieldConstants.AMP_ALIGN_POSE_BLUE.getTranslation()) <= 
+      // Constants.Auton.MAX_ALIGN_DIST_METERS ?
+      DriveToPose.getCommand(Constants.FieldConstants.AMP_ALIGN_POSE_BLUE)/* : 
+      new Command() {}*/);
+
     // this.xboxDriver.getBButton().onTrue(new MoveClimberUp());
     // this.xboxDriver.getAButton().onTrue(new MoveClimberDown());
 
-    this.xboxDriver.getLeftBumper().onTrue(intakeG = new IntakeNoteManual()); //TODO: CHECK W KUSH
+    // this.xboxDriver.getLeftBumper().onTrue(intakeG = new IntakeNoteManual()); //TODO: CHECK W KUSH
 
     this.xboxDriver.getRightMiddleButton().onTrue(new RollIntakeEject());
     this.xboxDriver.getRightBumper().onTrue(new CancelIntakeNote(intakeG, feedHold, swerveDrive));
@@ -214,6 +246,8 @@ public class RobotContainer {
     if (instance == null) {
       instance = new RobotContainer();
     }
+    
+    
     return instance;
   }
   

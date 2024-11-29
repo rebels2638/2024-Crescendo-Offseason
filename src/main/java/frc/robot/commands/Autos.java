@@ -18,6 +18,7 @@ import frc.robot.commands.intake.RollIntakeOut;
 import frc.robot.commands.intake.StopIntake;
 import frc.robot.commands.pivot.PivotToTorus;
 import frc.robot.commands.pivot.PivotTurtle;
+import frc.robot.commands.shooterComp.AutoCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.drivetrain.swerve.SwerveDrive;
 import frc.robot.subsystems.drivetrain.vision.NoteDetector;

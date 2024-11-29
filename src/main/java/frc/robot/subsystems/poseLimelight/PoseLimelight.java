@@ -63,18 +63,18 @@ public class PoseLimelight extends SubsystemBase {
         // Logger.recordOutput("PoseLimelight/estRobotPose", getEstimatedRobotPose());
     }
 
-    public double getPrimaryIDMovment() {
-        Queue<Double[]> queue = tagQueue[inputs.primaryTagId];
-        List<Double[]> list = new ArrayList<Double[]>(queue);
-        double lastTime = 0; 
+    // public double getPrimaryIDMovment() {
+    //     Queue<Double[]> queue = tagQueue[inputs.primaryTagId];
+    //     List<Double[]> list = new ArrayList<Double[]>(queue);
+    //     double lastTime = 0; 
         
-        for (int i = list.size() - 1; i >= 0; i--) {
-            double dt = list.get(list.size() - 1)[3].doubleValue() - list.get(i)[3].doubleValue();
-            if (list.get(i)[2].doubleValue() == 1 && dt <= 0.2) {
-                return Math.hypot(, i) / list.get(i)
-            }
-        }
-    }
+    //     for (int i = list.size() - 1; i >= 0; i--) {
+    //         double dt = list.get(list.size() - 1)[3].doubleValue() - list.get(i)[3].doubleValue();
+    //         if (list.get(i)[2].doubleValue() == 1 && dt <= 0.2) {
+    //             return Math.hypot(, i) / list.get(i)
+    //         }
+    //     }
+    // }
 
     public boolean hasValidTargets() {
         return inputs.hasValidTargets;

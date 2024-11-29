@@ -63,7 +63,12 @@ public class AutoRunner {
                         Constants.Auton.ANGLE_PID_CONFIG, // Rotation PID constants
                         Constants.Auton.MAX_MODULE_SPEED, // Max module speed, in m/s
                         0.5384061785684372, // Drive base radius in meters. Distance from robot center to furthest module.
-                        new ReplanningConfig() // Default path replanning config. See the API for the options here
+                        new ReplanningConfig(
+                            true,
+                            true,
+                            .5,
+                            .4
+                        ) // Default path replanning config. See the API for the options here
                 ),
                 () -> {
                     // Boolean supplier that controls when the path will be mirrored for the red alliance

@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.intake.RollIntakeIn;
 import frc.robot.commands.intake.StopIntake;
 import frc.robot.commands.shooterComp.ShooterStop;
+import frc.robot.subsystems.noteVisulaizer.NoteVisualizer;
 
 public class ShootNoteTele extends SequentialCommandGroup {
     public ShootNoteTele() {

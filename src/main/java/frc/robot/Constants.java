@@ -8,7 +8,9 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -22,7 +24,7 @@ import edu.wpi.first.math.geometry.Translation3d;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final Mode currentMode = Mode.REAL; // TODO: change this if sim
+  public static final Mode currentMode = Mode.SIM; // TODO: change this if sim
   // public static final boolean isSYSID = true; // TODO: change this if sysid
   public static enum Mode {
     /** Running on a real robot. */
@@ -37,6 +39,7 @@ public final class Constants {
     REPLAY_SIM,
   }
   
+ 
   public static class OperatorConstants {
     public static final int kDRIVER_CONTROLLER_PORT = 0;
 
@@ -51,9 +54,9 @@ public final class Constants {
 
   public static final class Auton
   {
-
+    public static final double MAX_ALIGN_DIST_METERS = 3;
     public static final PIDConstants TRANSLATION_PID_CONFIG = new PIDConstants(3.8, 0, 0);
-    public static final PIDConstants ANGLE_PID_CONFIG = new PIDConstants(5, 0, 0.03, Math.PI * 2 * .12); 
+    public static final PIDConstants ANGLE_PID_CONFIG = new PIDConstants(3, 0, 0.2); 
 
     public static final double MAX_MODULE_SPEED = 4.5;
     public static final double MAX_ACCELERATION = 3.5;
@@ -118,8 +121,9 @@ public final class Constants {
       new Translation3d(2.89, 5.54, 0),
       new Translation3d(2.89, 4.10, 0),
     };
-
+    
     public static final double kNOTE_DIAMETER_METERS = 0.36;
+    public static final Pose2d AMP_ALIGN_POSE_BLUE = new Pose2d(1.82, 7.64, new Rotation2d(Math.toRadians(-90)));
   }
 
   public static class VisionConstants {

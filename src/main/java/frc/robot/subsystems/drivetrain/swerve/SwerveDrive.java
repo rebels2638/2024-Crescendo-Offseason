@@ -11,7 +11,6 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -72,19 +71,11 @@ public class SwerveDrive extends SubsystemBase {
     private ChassisSpeeds measuredRobotRelativeSpeeds = new ChassisSpeeds(0,0,0);
     private ChassisSpeeds measuredFieldRelativeSpeeds = new ChassisSpeeds(0,0,0);
 
-    private PIDController m_angleFeedbackController = new PIDController(1, 0, 0);;
     private DriveFFController driveFFController = new DriveFFController();
-
+    private PIDController m_angleFeedbackController = new PIDController(1, 0, 0);;
     private PIDController m_translationalFeedbackController = new PIDController(1, 0, 0);
 
     private SwerveModuleState[] measuredModuleStates = {
-        new SwerveModuleState(),
-        new SwerveModuleState(),
-        new SwerveModuleState(),
-        new SwerveModuleState()
-    };
-
-    private SwerveModuleState[] previousDesiredStates = {
         new SwerveModuleState(),
         new SwerveModuleState(),
         new SwerveModuleState(),
@@ -116,12 +107,10 @@ public class SwerveDrive extends SubsystemBase {
     private final SlewRateLimiter[] moduleDriveSlewRateLimiters = new SlewRateLimiter[4];
 
     private double prevDiscretizationTime = 0;
-    private double prevGyroTime = 0;
-    private double prevGyroYawDeg = 0;
     
-    private final PoseLimelight poseLimelight;
-    public SwerveDrive(PoseLimelight poseLimelight) {
-        this.poseLimelight = poseLimelight;
+    // private final PoseLimelight poseLimelight;
+    public SwerveDrive(/*PoseLimelight poseLimelight*/) {
+        // this.poseLimelight = poseLimelight;
 
         switch (Constants.currentMode) {
             case SIM:
@@ -173,7 +162,8 @@ public class SwerveDrive extends SubsystemBase {
                 new SwerveModulePosition(0, new Rotation2d()),
                 new SwerveModulePosition(0, new Rotation2d())
             },
-            new Pose2d());
+            new Pose2d()
+        );
 
         odometryThread = new Notifier(this::updateOdometry);
         odometryThread.startPeriodic(0.02);
@@ -185,7 +175,6 @@ public class SwerveDrive extends SubsystemBase {
                     -Constants.DrivetrainConstants.kMAX_MODULE_DRIVE_DECELERATION_METERS_PER_SECOND,
                     0);
         }
-
     }
 
     private void updateInputs() {
@@ -242,17 +231,15 @@ public class SwerveDrive extends SubsystemBase {
 
         //TODO: THIS SHOULD BE BEFORE THE NT CALL INSIDE OF THE LIMELIGHT SUBSYSTEM. MOST LIKELY NO DIFFRENCE AS THIS IS THE RATE THAT POSE ESTIM UPDATES A
         // TODO: CHECK UNITS FOR THE REST OF THIS MEATHOD?!!?!?!?! 0,0,00,0,00, idk whhat units aojsnd awijfevkb c'wekfadszx
-        LimelightHelpers.SetRobotOrientation("limelight-tag", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        // LimelightHelpers.SetRobotOrientation("limelight-tag", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
 
-        // // TODO: add a queue for the gyro velocities to sync w the target delay - this is like a minor optimization
-        if (poseLimelight.hasValidTargets() /*&& Math.abs((yaw.getDegrees() - prevGyroYawDeg)/(Timer.getFPGATimestamp() - prevGyroTime)) <= 180*/) {
-            m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+        // // // TODO: add a queue for the gyro velocities to sync w the target delay - this is like a minor optimization
 
-            m_poseEstimator.addVisionMeasurement(poseLimelight.getEstimatedRobotPose(), poseLimelight.getTimestampSeconds());
-        }
+        // if (poseLimelight.hasValidTargets() && Math.toDegrees(Math.abs(gyroInputs.yawRadSec)) <= 15) {
+        //     m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7 + Math.abs(gyroInputs.yawRadSec) * 0.1, 0.7 + Math.abs(gyroInputs.yawRadSec) * 0.1,9999999));
 
-        prevGyroYawDeg = yaw.getDegrees();
-        prevGyroTime = Timer.getFPGATimestamp();
+        //     m_poseEstimator.addVisionMeasurement(poseLimelight.getEstimatedRobotPose(), poseLimelight.getTimestampSeconds());
+        // }
 
         measuredRobotRelativeSpeeds = m_kinematics.toChassisSpeeds(
             measuredModuleStates[0],
@@ -364,7 +351,7 @@ public class SwerveDrive extends SubsystemBase {
 
         yaw = pose.getRotation();
         Logger.recordOutput("IntialYAW", yaw.getDegrees());
-        m_poseEstimator.resetPosition(gyroInputs.yaw, positions, pose); // TODO change this from gyroIO to yaw
+        m_poseEstimator.resetPosition(yaw, positions, pose); // TODO change this from gyroIO to yaw
 
         odometryLock.unlock();
     }
